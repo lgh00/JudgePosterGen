@@ -26,7 +26,7 @@ from src.agents.renderer import renderer_node
 from utils.src.logging_utils import log_agent_info, log_agent_success, log_agent_error
 
 env_path = Path(__file__).parent.parent.parent / '.env'
-load_dotenv(env_path)
+load_dotenv(env_path, override=True)
 
 def create_workflow_graph() -> StateGraph:
     """create the langgraph workflow"""

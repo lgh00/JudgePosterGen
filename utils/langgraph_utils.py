@@ -15,7 +15,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src.state.poster_state import ModelConfig
 
-load_dotenv()
+load_dotenv(override=True) # reload env every time
 
 
 def create_model(config: ModelConfig):
