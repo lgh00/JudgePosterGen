@@ -82,6 +82,48 @@ def create_model(config: ModelConfig):
             zhipu_kwargs['base_url'] = base_url
             
         return ChatOpenAI(**zhipu_kwargs)
+    elif config.provider == 'moonshot':
+        moonshot_kwargs = {
+            'model': config.model_name,
+            'temperature': config.temperature,
+            'max_tokens': config.max_tokens,
+            'api_key': os.getenv('MOONSHOT_API_KEY'),
+            'timeout': timeout_settings['request_timeout'],
+            'max_retries': timeout_settings['max_retries'],
+        }
+        base_url = os.getenv('MOONSHOT_BASE_URL')
+        if base_url:
+            moonshot_kwargs['base_url'] = base_url
+            
+        return ChatOpenAI(**moonshot_kwargs)
+    elif config.provider == 'Minimax':
+        minimax_kwargs = {
+            'model': config.model_name,
+            'temperature': config.temperature,
+            'max_tokens': config.max_tokens,
+            'api_key': os.getenv('MINIMAX_API_KEY'),
+            'timeout': timeout_settings['request_timeout'],
+            'max_retries': timeout_settings['max_retries'],
+        }
+        base_url = os.getenv('MINIMAX_BASE_URL')
+        if base_url:
+            minimax_kwargs['base_url'] = base_url
+            
+        return ChatOpenAI(**minimax_kwargs)
+    elif config.provider == 'Alibaba':
+        alibaba_kwargs = {
+            'model': config.model_name,
+            'temperature': config.temperature,
+            'max_tokens': config.max_tokens,
+            'api_key': os.getenv('ALIBABA_API_KEY'),
+            'timeout': timeout_settings['request_timeout'],
+            'max_retries': timeout_settings['max_retries'],
+        }
+        base_url = os.getenv('ALIBABA_BASE_URL')
+        if base_url:
+            alibaba_kwargs['base_url'] = base_url
+            
+        return ChatOpenAI(**alibaba_kwargs)
     else:
         raise ValueError(f"unsupported provider: {config.provider}")
 

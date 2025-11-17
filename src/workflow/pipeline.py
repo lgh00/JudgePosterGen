@@ -58,10 +58,10 @@ def main():
     parser = argparse.ArgumentParser(description="PosterGen: Multi-agent Aesthetic-aware Paper-to-poster generation")
     parser.add_argument("--paper_path", type=str, required=True, help="Path to the PDF paper")
     parser.add_argument("--text_model", type=str, default="gpt-4o-2024-08-06", 
-                       choices=["gpt-4o-2024-08-06", "gpt-4.1-2025-04-14", "gpt-4.1-mini-2025-04-14", "claude-sonnet-4-20250514", "gemini-2.5-pro", "glm-4.6", "glm-4.5", "glm-4.5-air", "glm-4"],
+                       choices=["gpt-4o-2024-08-06", "gpt-4.1-2025-04-14", "gpt-4.1-mini-2025-04-14", "claude-sonnet-4-20250514", "gemini-2.5-pro", "glm-4.6", "glm-4.5", "glm-4.5-air", "glm-4", "kimi-k2-turbo-preview", "MiniMax-M2", "qwen3-max"],
                        help="Text model for content processing")
     parser.add_argument("--vision_model", type=str, default="gpt-4o-2024-08-06",
-                       choices=["gpt-4o-2024-08-06", "gpt-4.1-2025-04-14", "gpt-4.1-mini-2025-04-14", "claude-sonnet-4-20250514", "gemini-2.5-pro", "glm-4.5v", "glm-4v"],
+                       choices=["gpt-4o-2024-08-06", "gpt-4.1-2025-04-14", "gpt-4.1-mini-2025-04-14", "claude-sonnet-4-20250514", "gemini-2.5-pro", "glm-4.5v", "glm-4v", "moonshot-v1-8k-vision-preview", "MiniMax-M2", "qwen3-vl-plus"],
                        help="Vision model for image analysis")
     parser.add_argument("--poster_width", type=float, default=54, help="Poster width in inches")
     parser.add_argument("--poster_height", type=float, default=36, help="Poster height in inches")
@@ -88,10 +88,13 @@ def main():
         print(f"❌ .env file NOT found")
     
     # check api keys
-    required_keys = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY", "google": "GOOGLE_API_KEY", "zhipu": "ZHIPU_API_KEY"}
+    required_keys = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY", "google": "GOOGLE_API_KEY", "zhipu": "ZHIPU_API_KEY", "moonshot": "MOONSHOT_API_KEY", "Minimax": "MINIMAX_API_KEY", "Alibaba": "ALIBABA_API_KEY"}
     model_providers = {"claude-sonnet-4-20250514": "anthropic", "gemini": "google", "gemini-2.5-pro": "google",
                       "gpt-4o-2024-08-06": "openai", "gpt-4.1-2025-04-14": "openai", "gpt-4.1-mini-2025-04-14": "openai",
-                      "glm-4.6": "zhipu", "glm-4.5": "zhipu", "glm-4.5-air": "zhipu", "glm-4.5v": "zhipu", "glm-4": "zhipu", "glm-4v": "zhipu"}
+                      "glm-4.6": "zhipu", "glm-4.5": "zhipu", "glm-4.5-air": "zhipu", "glm-4.5v": "zhipu", "glm-4": "zhipu", "glm-4v": "zhipu",
+                      "kimi-k2-turbo-preview": "moonshot", "moonshot-v1-8k-vision-preview": "moonshot",
+                      "qwen3-max": "Alibaba", "qwen3-vl-plus": "Alibaba",
+                      "MiniMax-M2":"Minimax",}
     
     needed_keys = set()
     if args.text_model in model_providers:
