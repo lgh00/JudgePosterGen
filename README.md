@@ -26,7 +26,7 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2508.17188">
-    <img src="https://img.shields.io/badge/ArXiv-2508.17188-red?style=flat-square&logo=arxiv" alt="Paper">
+    <img src="https://img.shields.io/badge/ArXiv-2508.17188-B31B1B?style=flat-square&logo=arxiv" alt="Paper">
   </a>
   <a href="https://Y-Research-SBU.github.io/PosterGen">
     <img src="https://img.shields.io/badge/Project-Website-blue?style=flat-square&logo=googlechrome" alt="Project Website">
