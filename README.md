@@ -41,7 +41,7 @@
   <a href="https://github.com/Y-Research-SBU/PosterGen/issues/1">
     <img src="https://img.shields.io/badge/WeChat-Group-green?style=flat-square&logo=wechat" alt="WeChat Group">
   </a>
-  <a href="https://discord.gg/FPCDkyWk">
+  <a href="https://discord.gg/BSJpG8TQSg">
     <img src="https://img.shields.io/badge/Discord-Community-5865F2?style=flat-square&logo=discord" alt="Discord Community">
   </a>
 </p>
