@@ -130,13 +130,15 @@ def create_model(config: ModelConfig):
 
 class LangGraphAgent:
     """langgraph agent wrapper"""
-    
-    def __init__(self, system_msg: str, config: ModelConfig):
+
+    def __init__(self, system_msg: str, config: ModelConfig, state=None, agent_name: str = "unknown"):
         self.system_msg = system_msg
         self.config = config
         self.model = create_model(config)
         self.history = [SystemMessage(content=system_msg)]
-    
+        self.state = state
+        self.agent_name = agent_name
+
     def reset(self):
         """reset conversation"""
         self.history = [SystemMessage(content=self.system_msg)]
@@ -197,7 +199,10 @@ class LangGraphAgent:
             raise
         
         self.history.append(response)
-        
+
+        if self.state is not None and hasattr(self.state.get('timing_metrics'), 'add_api_call'):
+            self.state['timing_metrics'].add_api_call(self.agent_name, 'text', int(input_tokens), int(output_tokens))
+
         return AgentResponse(response.content, input_tokens, output_tokens)
     
     def _step_vision(self, messages: List[Dict]) -> 'AgentResponse':
@@ -242,9 +247,13 @@ class LangGraphAgent:
                 print(f"⚠️  Rate limit exceeded for vision calls on {self.config.provider}")
             elif "authentication" in str(e).lower() or "api key" in str(e).lower():
                 print(f"⚠️  Authentication error for vision calls on {self.config.provider}")
-            
+
+
             raise
-        
+
+        if self.state is not None and hasattr(self.state.get('timing_metrics'), 'add_api_call'):
+            self.state['timing_metrics'].add_api_call(self.agent_name, 'vision', int(input_tokens), int(output_tokens))
+
         return AgentResponse(response.content, input_tokens, output_tokens)
 
 

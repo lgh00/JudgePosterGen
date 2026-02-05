@@ -68,7 +68,7 @@ class FontAgent:
         # extract keywords using LLM with external prompt
         log_agent_info(self.name, "identifying keywords for highlighting")
         
-        agent = LangGraphAgent("expert at identifying key terms for visual highlighting", state["text_model"])
+        agent = LangGraphAgent("expert at identifying key terms for visual highlighting", state["text_model"], state, "font_agent")
         
         template_data = {
             "enhanced_narrative": json.dumps(enhanced_narrative, indent=2),

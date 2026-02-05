@@ -58,25 +58,20 @@ class Parser:
 
             figures, tables = self._extract_assets(raw_result, state["poster_name"], assets_dir)
             
-            # extract title and authors from raw text
-            title, authors = self._extract_title_authors(raw_text, state["text_model"])
-            
-            # generate narrative content
-            narrative_content, inp_tok, out_tok = self._generate_narrative_content(raw_text, state["text_model"])
+            title, authors = self._extract_title_authors(raw_text, state["text_model"], state)
+
+            narrative_content, inp_tok, out_tok = self._generate_narrative_content(raw_text, state["text_model"], state)
             state["tokens"].add_text(inp_tok, out_tok)
-            
-            # classify visual assets by importance
-            classified_visuals, inp_tok2, out_tok2 = self._classify_visual_assets(figures, tables, raw_text, state["text_model"])
+
+            classified_visuals, inp_tok2, out_tok2 = self._classify_visual_assets(figures, tables, raw_text, state["text_model"], state)
             state["tokens"].add_text(inp_tok2, out_tok2)
-            
-            # narrative metadata
+
             narrative_content["meta"] = {
                 "poster_title": title,
                 "authors": authors
             }
-            
-            # extract structured sections from raw text
-            structured_sections = self._extract_structured_sections(raw_text, state["text_model"])
+
+            structured_sections = self._extract_structured_sections(raw_text, state["text_model"], state)
             
             # save artifacts and update state
             self._save_content(narrative_content, "narrative_content.json", content_dir)
@@ -121,9 +116,9 @@ class Parser:
         raw_result = (document, rendered, images)
         return text, raw_result
 
-    def _generate_narrative_content(self, text: str, config) -> Tuple[Dict, int, int]:
+    def _generate_narrative_content(self, text: str, config, state) -> Tuple[Dict, int, int]:
         log_agent_info(self.name, "generating abt narrative")
-        agent = LangGraphAgent("expert poster design consultant", config)
+        agent = LangGraphAgent("expert poster design consultant", config, state, "parser")
         
         for attempt in range(3):
             try:
@@ -274,10 +269,9 @@ class Parser:
             if png_file.name not in valid_paths:
                 png_file.unlink()
 
-    def _extract_title_authors(self, text: str, config) -> Tuple[str, str]:
-        """extract title and authors via llm api"""
+    def _extract_title_authors(self, text: str, config, state) -> Tuple[str, str]:
         log_agent_info(self.name, "extracting title and authors with llm")
-        agent = LangGraphAgent("expert academic paper parser", config)
+        agent = LangGraphAgent("expert academic paper parser", config, state, "parser")
         
         for attempt in range(3):
             try:
@@ -303,7 +297,7 @@ class Parser:
         return "Untitled", "Authors not found"
     
     
-    def _classify_visual_assets(self, figures: Dict, tables: Dict, raw_text: str, config) -> Tuple[Dict, int, int]:
+    def _classify_visual_assets(self, figures: Dict, tables: Dict, raw_text: str, config, state) -> Tuple[Dict, int, int]:
         # combine all visuals for classification
         all_visuals = []
         for fig_id, fig_data in figures.items():
@@ -326,7 +320,7 @@ class Parser:
             return {"key_visual": None, "problem_illustration": [], "method_workflow": [], "main_results": [], "comparative_results": [], "supporting": []}, 0, 0
             
         log_agent_info(self.name, f"classifying {len(all_visuals)} visual assets")
-        agent = LangGraphAgent("expert poster designer", config)
+        agent = LangGraphAgent("expert poster designer", config, state, "parser")
         
         for attempt in range(3):
             try:
@@ -372,11 +366,9 @@ class Parser:
         
         return classification
 
-    def _extract_structured_sections(self, raw_text: str, config) -> Dict:
-        """extract structured sections from raw paper text"""
-        
+    def _extract_structured_sections(self, raw_text: str, config, state) -> Dict:
         log_agent_info(self.name, "extracting structured sections from paper")
-        agent = LangGraphAgent("expert paper section extractor", config)
+        agent = LangGraphAgent("expert paper section extractor", config, state, "parser")
         
         for attempt in range(3):
             try:

@@ -29,7 +29,7 @@ class BalancerAgent:
         
         log_agent_info(self.name, f"utilization - left: {left_rate:.1%}, middle: {middle_rate:.1%}, right: {right_rate:.1%}")
         
-        agent = LangGraphAgent("layout optimization specialist", state["text_model"])
+        agent = LangGraphAgent("layout optimization specialist", state["text_model"], state, "layout_optimizer")
         
         variables = {
             "structured_sections": json.dumps(structured_sections, indent=2),

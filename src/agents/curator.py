@@ -44,9 +44,9 @@ class StoryBoardCurator:
             visual_context = self._prepare_visual_context_for_curator(state)
             
             story_board, inp, out = self._create_story_board(
-                structured_sections, narrative_content, classified_visuals, 
+                structured_sections, narrative_content, classified_visuals,
                 state.get("images", {}), state.get("tables", {}),
-                visual_context, state["text_model"]
+                visual_context, state["text_model"], state
             )
             state["tokens"].add_text(inp, out)
             
@@ -74,10 +74,9 @@ class StoryBoardCurator:
             
         return state
 
-    def _create_story_board(self, structured_sections, narrative_content, classified_visuals, images, tables, visual_context, config):
-        
+    def _create_story_board(self, structured_sections, narrative_content, classified_visuals, images, tables, visual_context, config, state):
         log_agent_info(self.name, "generating spatial content plan")
-        agent = LangGraphAgent("expert spatial poster designer", config)
+        agent = LangGraphAgent("expert spatial poster designer", config, state, "curator")
         
         template_data = {
             "structured_sections": json.dumps(structured_sections, indent=2),

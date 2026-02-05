@@ -51,9 +51,12 @@ class PosterRequest(BaseModel):
 def get_available_models():
     return [
         "claude-sonnet-4-20250514",
+        "claude-opus-4.5",
         "gpt-4o-2024-08-06",
         "gpt-4.1-2025-04-14",
         "gpt-4.1-mini-2025-04-14",
+        "glm-4.6",
+        "glm-4.6v",
         "glm-4.5",
         "glm-4.5-air",
         "glm-4.5v",

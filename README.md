@@ -230,6 +230,7 @@ output/
 └── <paper_name>/
     ├── <paper_name>.png           # final poster image
     ├── <paper_name>.pptx          # editable PowerPoint file
+    ├── timing_cost_log.json       # runtime & api cost log
     ├── assets/                    # extracted content from paper via Marker
     │   ├── figures.json           # figure metadata with aspect ratios
     │   ├── tables.json            # table metadata with aspect ratios

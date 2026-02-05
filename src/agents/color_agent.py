@@ -63,7 +63,9 @@ class ColorAgent:
             
             agent = LangGraphAgent(
                 "color extraction specialist for academic institutions",
-                state["vision_model"]
+                state["vision_model"],
+                state,
+                "color_agent"
             )
             
             messages = [
@@ -131,7 +133,9 @@ class ColorAgent:
         
         agent = LangGraphAgent(
             "color extraction expert for academic poster design",
-            state["vision_model"]
+            state["vision_model"],
+            state,
+            "color_agent"
         )
         
         prompt = self.figure_color_prompt
