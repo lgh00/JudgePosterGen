@@ -1,0 +1,132 @@
+# Spatial Academic Poster Content Planner
+
+**Role**: Professional academic poster designer, skilled at creating visually dense posters with low comprehension threshold content space layout.
+
+**Task**: Transform the research paper into poster sections with logical sequence, while following the logic of human cognition and maximizing the use of image resources. Prioritize the recognition utility and visual impact of the poster for the audience over the density of text.
+
+**Input Data:**
+- Paper Structured Sections: {{ structured_sections }}
+- Enhanced ABT Narrative: {{ narrative_content }}
+- Classified Visuals: {{ classified_visuals }}
+- Available Images: {{ available_images }}
+- Available Tables: {{ available_tables }}
+
+**CRITICAL: Visual Asset Strategic Selection Process**
+
+**Step 1 - Priority Ranking of Classified Visual Elements**
+- Rank the visual elements by their information contribution to the corresponding section, placing those that better represent the section higher in priority. For example, in the Research Methods section, position the complete experimental flow chart at the front and the detailed experimental flow chart at the back.
+- Provide the placement rationale for each visual element
+
+**Step 2 - Distribution of Visual Elements Based on Sections**
+**CRITICAL: Ensure a balanced distribution of visual elements across all sections
+
+**Research_Background:**
+- **Maximum:** 1 visual assets
+
+**Research_Method:**
+- **MANDATORY:** Contains 1 visual assets
+- **Maximum:** 2 visual assets
+
+**Research_Results:**
+- **MANDATORY:** Contains 1 visual assets
+- **Maximum:** 2 visual assets
+
+**Conclusion_Outlook:**
+- **STRICT MAXIMUM:** 1 visual assets ONLY
+
+**When Too Many Visuals Exist:**
+- Remove the visual assets with lower priority, Convert less critical visuals to text summaries
+- **Example:** "Additional experiments showed 15% improvement (see paper Table 3)"
+
+**Step3 Validation of visual assets distribution**
+
+**CRITICAL VALIDATION RULES:**
+1.**Research_Background:**MUST have 0-1 visuals
+2.**Research_Method:**MUST have 1-2 visuals
+3.**Research_Results:**MUST have 1-2 visuals
+4.**Conclusion_Outlook:**MUST have EXACTLY 1 visuals
+5.**Total Visual Count:** Should be 3-6 visuals across entire poster
+
+**Content Organization Guidelines:**
+
+1. **Section Requirements:**
+    - **Section titles**:Adopt the original section names of the respective sections
+    - **Text content**:Compose 2 to 3 complete pieces of information with varied and rich formatting levels based on the section content (see examples below)
+    - **Visual element integration**:Integrate the classified visual elements into the section information
+    - **Complete content**: No ellipsis (...), write full bullet points
+
+2. **Rich Text Formatting Options (CRITICAL for Visual Hierarchy):**
+
+   **A) Nested Bullet Structure:**
+   ```
+   "• Primary concept or finding",
+   "    ◦ Supporting detail or sub-point",
+   "    ◦ Additional supporting evidence"
+   ```
+
+   **B) Bold Headers with Indented Content:**
+   ```
+   "**Key Idea:** Novel approach combines efficiency with accuracy optimization",
+   "",
+   "**Example:** Algorithm achieves 95% accuracy while maintaining efficiency"
+   ```
+
+   **C) Ordered Lists for Sequential Content:**
+   ```
+   "1) Data preprocessing and feature extraction",
+   "2) Model training with privacy constraints", 
+   "3) Evaluation on benchmark datasets"
+   ```
+
+   **D) Mixed Hierarchical Formatting:**
+   ```
+   "• **Core Innovation:** DP-CutMixSL applies patch-level randomized mixing",
+   "    ◦ Masks random patches using Dirichlet distribution",
+   "    ◦ Injects Gaussian noise before server upload",
+   "• **Impact:** Reduces privacy leakage without accuracy loss"
+   ```
+
+3.**Content Adaptation:**
+    - Use the structured sections of the paper as source material
+    - Adjust and reorganize the content to fit the poster format and reduce the level of comprehension difficulty
+    - Ensure narrative coherence in the spatial layout
+    - Maintain technical accuracy while making content scannable
+
+**Output Schema:**
+```json
+{
+  "spatial_content_plan":{
+    "sections": [
+      {
+        "section_title": "Research_Background",
+        "text_content": [
+          "• **Key Innovation:** Core contribution with bold emphasis",
+          "    ◦ Supporting technical detail",
+          "• **Impact:** Quantifiable result or benefit"
+        ],
+        "visual_assets": [
+          {
+            "visual_id": "figure_1",
+            "visual_purpose": "How this supports the section",
+            "placement_rationale": "Why this visual belongs in this spatial location"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Critical Success Criteria:**
+- **Full Space Utilization**:Each section must contain content
+- **Strategic placement**: Follow the sequence of Research Background, Research Method, Research Results, and Conclusion Outlook.
+- **Balanced Visual Distribution**:Strictly adhere to the visual element limits for each section:
+- Research_Background:**MUST have 0-1 visuals
+- Research_Method:**MUST have 1-2 visuals
+- Research_Results:**MUST have 1-2 visuals
+- Conclusion_Outlook:**MUST have EXACTLY 1 visuals
+- **Text Content Quality**: Concise, well-structured and scannable text with a rich formatting hierarchy
+- **Text Density Control**: A maximum of 3 paragraphs of text and no more than 5 key pieces of information per section, with conciseness as the top priority
+- **Visual Element Selection Strategy**: Only the most critical visual elements are selected, and those with lower priority are converted into textual content
+
+Generate a spatial content plan and achieve the optimal design of poster content through strategic content combination that adheres to human-centered design principles and cognitive comprehension patterns.

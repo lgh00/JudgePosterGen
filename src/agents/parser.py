@@ -39,9 +39,9 @@ class Parser:
         self.converter = PdfConverter(artifact_dict=create_model_dict(), config=config)
         self.clean_pattern = re.compile(r"<!--[\s\S]*?-->")
         self.enhanced_abt_prompt = load_prompt("config/prompts/narrative_abt_extraction.txt")
-        self.visual_classification_prompt = load_prompt("config/prompts/classify_visuals.txt")
+        self.visual_classification_prompt = load_prompt("config/prompts/new_classify_visuals.txt")#修改了
         self.title_authors_prompt = load_prompt("config/prompts/extract_title_authors.txt")
-        self.section_extraction_prompt = load_prompt("config/prompts/extract_structured_sections.txt")
+        self.section_extraction_prompt = load_prompt("config/prompts/new_extract_structured_sections.txt")#修改了
     
     def __call__(self, state: PosterState) -> PosterState:
         log_agent_info(self.name, "starting foundation building")
@@ -90,7 +90,7 @@ class Parser:
             log_agent_success(self.name, f"extracted raw text, {len(figures)} images, and {len(tables)} tables")
             log_agent_success(self.name, f"extracted title: {title}")
             log_agent_success(self.name, "generated enhanced abt narrative")
-            log_agent_success(self.name, f"classified visuals: key={classified_visuals.get('key_visual', 'none')}, problem_ill={len(classified_visuals.get('problem_illustration', []))}, method_wf={len(classified_visuals.get('method_workflow', []))}, main_res={len(classified_visuals.get('main_results', []))}, comp_res={len(classified_visuals.get('comparative_results', []))}, support={len(classified_visuals.get('supporting', []))}")
+            log_agent_success(self.name, f"classified visuals: title and authors={classified_visuals.get('title_author', 'none')}, research background={len(classified_visuals.get('research_background', []))}, research method={len(classified_visuals.get('method_workflow', []))}, research result={len(classified_visuals.get('research_results', []))}, conclusion outlook={len(classified_visuals.get('conclusion_outlook', []))}")
             
         except Exception as e:
             log_agent_error(self.name, f"failed: {e}")
@@ -317,7 +317,7 @@ class Parser:
             })
         
         if not all_visuals:
-            return {"key_visual": None, "problem_illustration": [], "method_workflow": [], "main_results": [], "comparative_results": [], "supporting": []}, 0, 0
+            return {"title_author": None, "research_background": [], "research_method": [], "research_results": [], "conclusion_outlook": []}, 0, 0
             
         log_agent_info(self.name, f"classifying {len(all_visuals)} visual assets")
         agent = LangGraphAgent("expert poster designer", config, state, "parser")
@@ -333,7 +333,7 @@ class Parser:
                 classification = extract_json(response.content)
                 
                 # validate classification
-                required_keys = ["key_visual", "problem_illustration", "method_workflow", "main_results", "comparative_results", "supporting"]
+                required_keys = ["title_author", "research_background", "research_method", "research_results", "conclusion_outlook"]
                 if all(key in classification for key in required_keys):
                     return classification, response.input_tokens, response.output_tokens
                     
@@ -347,23 +347,25 @@ class Parser:
     
     def _fallback_visual_classification(self, visuals):
         # simple rule-based fallback
-        classification = {"key_visual": None, "main_results": [], "method_diagrams": [], "supporting": []}
+        classification = {"title_author": [], "research_background": [], "research_method": [], "research_results": [], "conclusion_outlook": []}
         
         for visual in visuals:
             caption = visual.get("caption", "").lower()
             if "result" in caption or "performance" in caption or "comparison" in caption:
-                classification["main_results"].append(visual["id"])
+                classification["research_results"].append(visual["id"])
             elif "method" in caption or "architecture" in caption or "framework" in caption:
-                classification["method_diagrams"].append(visual["id"])
-            else:
-                classification["supporting"].append(visual["id"])
-        
+                classification["research_method"].append(visual["id"])
+            elif "background" in caption or "other" in caption:
+                classification["research_background"].append(visual["id"])
+            elif "conclusion" in caption or "summary" in caption or "future" in caption or "contribution" in caption or "application" in caption:
+                classification["conclusion_outlook"].append(visual["id"])
+        '''
         # select key visual from main results or method diagrams
         if classification["main_results"]:
             classification["key_visual"] = classification["main_results"][0]
         elif classification["method_diagrams"]:
             classification["key_visual"] = classification["method_diagrams"][0]
-        
+        '''
         return classification
 
     def _extract_structured_sections(self, raw_text: str, config, state) -> Dict:
@@ -392,13 +394,6 @@ class Parser:
         # fallback empty structure
         return {
             "paper_sections": [],
-            "paper_structure": {
-                "total_sections": 0,
-                "foundation_sections": 0,
-                "method_sections": 0,
-                "evaluation_sections": 0,
-                "conclusion_sections": 0
-            }
         }
     
     def _validate_structured_sections(self, structured_sections: Dict) -> bool:
@@ -408,13 +403,13 @@ class Parser:
             return False
         
         sections = structured_sections["paper_sections"]
-        if not isinstance(sections, list) or len(sections) < 3:
-            log_agent_warning(self.name, f"validation error: need at least 3 sections, got {len(sections)}")
+        if not isinstance(sections, list) or len(sections) != 5:
+            log_agent_warning(self.name, f"validation error: need 5 sections, got {len(sections)}")
             return False
         
         # validate each section
         for i, section in enumerate(sections):
-            required_fields = ["section_name", "section_type", "content"]
+            required_fields = ["section_name", "content"]
             for field in required_fields:
                 if field not in section:
                     log_agent_warning(self.name, f"validation error: section {i} missing '{field}'")

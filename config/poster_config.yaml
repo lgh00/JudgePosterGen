@@ -176,6 +176,7 @@ section_estimation:
 validation:
   max_section_count: 8
   min_section_count: 5
+  section_count: 5
   max_title_words: 4
   min_text_content_items: 2
   max_llm_attempts: 3

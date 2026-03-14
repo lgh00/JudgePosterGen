@@ -17,7 +17,7 @@ class StoryBoardCurator:
     
     def __init__(self):
         self.name = "spatial_content_planner"
-        self.spatial_planning_prompt = load_prompt("config/prompts/spatial_content_planner.txt")
+        self.spatial_planning_prompt = load_prompt("config/prompts/new_spatial_content_planner.txt")#修改了
         self.config = load_config()
         self.validation_config = self.config["validation"]
         self.utilization_config = self.config["utilization_thresholds"]
@@ -85,9 +85,7 @@ class StoryBoardCurator:
             "available_images": json.dumps({k: {"caption": v.get("caption", ""), "aspect": v.get("aspect", 1.0)} 
                                           for k, v in images.items()}, indent=2),
             "available_tables": json.dumps({k: {"caption": v.get("caption", ""), "aspect": v.get("aspect", 1.0)} 
-                                          for k, v in tables.items()}, indent=2),
-            "available_height_per_column": visual_context["available_height_per_column"],
-            "visual_heights_info": json.dumps(visual_context["visual_assets_heights"], indent=2)
+                                          for k, v in tables.items()}, indent=2)
         }
         
         max_attempts = self.validation_config["max_llm_attempts"]
@@ -126,20 +124,26 @@ class StoryBoardCurator:
             return False
         
         sections = scp["sections"]
+        '''
         min_sections = self.validation_config["min_section_count"]
         max_sections = self.validation_config["max_section_count"] 
         if len(sections) < min_sections or len(sections) > max_sections:
             log_agent_warning(self.name, f"validation error: need 5-8 sections, got {len(sections)}")
             return False
-        
+        '''
+        sections_num = self.validation_config["section_count"]
+        if len(sections) != sections_num:
+            log_agent_warning(self.name, f"validation error: need {sections_num} sections, got {len(sections)}")
+            return False
+
         # validate each section
         for i, section in enumerate(sections):
-            required_fields = ["section_id", "section_title", "column_assignment", "vertical_priority", "text_content"]
+            required_fields = ["section_title", "text_content"]
             for field in required_fields:
                 if field not in section:
                     log_agent_warning(self.name, f"validation error: section {i} missing '{field}'")
                     return False
-            
+            '''
             # check column assignment is valid
             if section["column_assignment"] not in ["left", "middle", "right"]:
                 log_agent_warning(self.name, f"validation error: section {i} invalid column_assignment")
@@ -157,7 +161,7 @@ class StoryBoardCurator:
             if title_words > max_words:
                 log_agent_warning(self.name, f"validation error: section {i} title too long ({title_words} words): '{title}'")
                 return False
-            
+            '''
             # check text content is list of bullet points
             min_items = self.validation_config["min_text_content_items"]
             if not isinstance(section["text_content"], list) or len(section["text_content"]) < min_items:
@@ -169,7 +173,7 @@ class StoryBoardCurator:
                 if "..." in text:
                     log_agent_warning(self.name, f"validation error: section {i} bullet {j} contains ellipsis")
                     return False
-        
+        '''
         # validate key_visual placement if classified_visuals provided
         if classified_visuals:
             key_visual = classified_visuals.get("key_visual")
@@ -196,7 +200,8 @@ class StoryBoardCurator:
                 if not key_visual_in_middle_top:
                     log_agent_warning(self.name, f"validation error: key_visual '{key_visual}' not placed in middle column, top priority")
                     return False
-        
+        '''
+        '''
         # validate height exclusion compliance if visual_context provided
         if visual_context:
             visual_heights = visual_context.get("visual_assets_heights", {})
@@ -239,7 +244,7 @@ class StoryBoardCurator:
                     invalid_visuals = [f"{vid} ({h_str})" for vid, h, h_str in selected_oversized if vid != smallest[0]]
                     log_agent_warning(self.name, f"validation error: oversized visuals (>50% height) selected: {invalid_visuals} (fallback: only smallest allowed: {smallest[0]} ({smallest[2]}))")
                     return False
-        
+        '''
         return True
 
     def _prepare_visual_context_for_curator(self, state: PosterState) -> Dict[str, Any]:

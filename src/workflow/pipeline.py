@@ -70,13 +70,15 @@ def create_workflow_graph() -> StateGraph:
 
     graph.add_edge(START, "parser")
     graph.add_edge("parser", "curator")
+    '''
     graph.add_edge("curator", "color_agent")
     graph.add_edge("color_agent", "section_title_designer")
     graph.add_edge("section_title_designer", "layout_optimizer")
     graph.add_edge("layout_optimizer", "font_agent")
     graph.add_edge("font_agent", "renderer")
     graph.add_edge("renderer", END)
-
+    '''
+    graph.add_edge("curator", END)
     return graph
 
 
