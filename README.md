@@ -177,13 +177,13 @@ uv run python -m src.workflow.pipeline \
 
 **For Conda setup:**
 ```bash
-python -m src.workflow.pipeline \
-  --poster_width 54 --poster_height 36 \
-  --paper_path ./data/Your_Paper_Name/paper.pdf \
-  --text_model gpt-4.1-2025-04-14 \
-  --vision_model gpt-4.1-2025-04-14 \
-  --logo ./data/Your_Paper_Name/logo.png \
-  --aff_logo ./data/Your_Paper_Name/aff.png
+python -m src.workflow.pipeline `
+  --poster_width 54 --poster_height 36 `
+  --paper_path ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/paper.pdf `
+  --text_model qwen3-max `
+  --vision_model qwen3-vl-plus `
+  --logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/logo.png `
+  --aff_logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/aff.png
 ```
 
 **Parameters:**

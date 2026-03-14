@@ -90,7 +90,7 @@ class Parser:
             log_agent_success(self.name, f"extracted raw text, {len(figures)} images, and {len(tables)} tables")
             log_agent_success(self.name, f"extracted title: {title}")
             log_agent_success(self.name, "generated enhanced abt narrative")
-            log_agent_success(self.name, f"classified visuals: title and authors={classified_visuals.get('title_author', 'none')}, research background={len(classified_visuals.get('research_background', []))}, research method={len(classified_visuals.get('method_workflow', []))}, research result={len(classified_visuals.get('research_results', []))}, conclusion outlook={len(classified_visuals.get('conclusion_outlook', []))}")
+            log_agent_success(self.name, f"classified visuals: title and authors={classified_visuals.get('title_author', 'none')}, research background={len(classified_visuals.get('research_background', []))}, research method={len(classified_visuals.get('research_method', []))}, research result={len(classified_visuals.get('research_results', []))}, conclusion outlook={len(classified_visuals.get('conclusion_outlook', []))}")
             
         except Exception as e:
             log_agent_error(self.name, f"failed: {e}")

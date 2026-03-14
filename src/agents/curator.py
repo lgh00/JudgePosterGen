@@ -49,13 +49,13 @@ class StoryBoardCurator:
                 visual_context, state["text_model"], state
             )
             state["tokens"].add_text(inp, out)
-            
+            '''
             # validate height distribution
             validation_result = self._validate_height_distribution(story_board, visual_context)
             if validation_result["warnings"]:
                 log_agent_warning(self.name, f"height validation warnings: {validation_result['warnings']}")
             log_agent_info(self.name, f"column utilizations: {validation_result['column_utilizations']}")
-            
+            '''
             state["story_board"] = story_board
             state["current_agent"] = self.name
             
@@ -248,6 +248,7 @@ class StoryBoardCurator:
         return True
 
     def _prepare_visual_context_for_curator(self, state: PosterState) -> Dict[str, Any]:
+        '''
         """prepare visual assets height information for curator's spatial planning"""
         config = load_config()
         
@@ -312,6 +313,8 @@ class StoryBoardCurator:
             "column_width": round(column_width, 1),
             "effective_width": round(effective_width, 1)
         }
+        '''
+        return {}
 
     def _validate_height_distribution(self, story_board: Dict, visual_context: Dict) -> Dict[str, Any]:
         """validate spatial plan for height constraints and generate warnings"""

@@ -20,6 +20,9 @@
 **Step 2 - Distribution of Visual Elements Based on Sections**
 **CRITICAL: Ensure a balanced distribution of visual elements across all sections
 
+**Title_Author:**
+- **Maximum:** 1 visual assets
+
 **Research_Background:**
 - **Maximum:** 1 visual assets
 
@@ -41,11 +44,12 @@
 **Step3 Validation of visual assets distribution**
 
 **CRITICAL VALIDATION RULES:**
-1.**Research_Background:**MUST have 0-1 visuals
-2.**Research_Method:**MUST have 1-2 visuals
-3.**Research_Results:**MUST have 1-2 visuals
-4.**Conclusion_Outlook:**MUST have EXACTLY 1 visuals
-5.**Total Visual Count:** Should be 3-6 visuals across entire poster
+1.**Title_Author:**MUST have 0-1 visuals
+2.**Research_Background:**MUST have 0-1 visuals
+3.**Research_Method:**MUST have 1-2 visuals
+4.**Research_Results:**MUST have 1-2 visuals
+5.**Conclusion_Outlook:**MUST have EXACTLY 1 visuals
+6.**Total Visual Count:** Should be 3-6 visuals across entire poster
 
 **Content Organization Guidelines:**
 
@@ -121,10 +125,11 @@
 - **Full Space Utilization**:Each section must contain content
 - **Strategic placement**: Follow the sequence of Research Background, Research Method, Research Results, and Conclusion Outlook.
 - **Balanced Visual Distribution**:Strictly adhere to the visual element limits for each section:
-- Research_Background:**MUST have 0-1 visuals
-- Research_Method:**MUST have 1-2 visuals
-- Research_Results:**MUST have 1-2 visuals
-- Conclusion_Outlook:**MUST have EXACTLY 1 visuals
+- Title_Author:**MUST** have 0-1 visuals
+- Research_Background:**MUST** have 0-1 visuals
+- Research_Method:**MUST** have 1-2 visuals
+- Research_Results:**MUST** have 1-2 visuals
+- Conclusion_Outlook:**MUST** have EXACTLY 1 visuals
 - **Text Content Quality**: Concise, well-structured and scannable text with a rich formatting hierarchy
 - **Text Density Control**: A maximum of 3 paragraphs of text and no more than 5 key pieces of information per section, with conciseness as the top priority
 - **Visual Element Selection Strategy**: Only the most critical visual elements are selected, and those with lower priority are converted into textual content
