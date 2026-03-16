@@ -23,7 +23,7 @@ from src.agents.layout_with_balancer import layout_with_balancer_node as layout_
 from src.agents.section_title_designer import section_title_designer_node
 from src.agents.color_agent import color_agent_node
 from src.agents.font_agent import font_agent_node
-from src.agents.renderer import renderer_node
+from src.agents.new_renderer import renderer_node
 from utils.src.logging_utils import log_agent_info, log_agent_success, log_agent_error
 
 env_path = Path(__file__).parent.parent.parent / '.env'
@@ -70,6 +70,7 @@ def create_workflow_graph() -> StateGraph:
 
     graph.add_edge(START, "parser")
     graph.add_edge("parser", "curator")
+    graph.add_edge("curator", "renderer")
     '''
     graph.add_edge("curator", "color_agent")
     graph.add_edge("color_agent", "section_title_designer")
@@ -78,7 +79,7 @@ def create_workflow_graph() -> StateGraph:
     graph.add_edge("font_agent", "renderer")
     graph.add_edge("renderer", END)
     '''
-    graph.add_edge("curator", END)
+    graph.add_edge("renderer", END)
     return graph
 
 
@@ -187,11 +188,11 @@ def main():
     # poster dimensions: fix width to 54", adjust height by ratio
     input_ratio = args.poster_width / args.poster_height
     # check poster ratio: lower bound 1.4 (ISO A paper size), upper bound 2 (human vision limit)
-    if input_ratio > 2 or input_ratio < 1.4:
-        print(f"❌ Poster ratio is out of range: {input_ratio}. Please use a ratio between 1.4 and 2.")
+    if input_ratio > 2 or input_ratio < 1.0:
+        print(f"❌ Poster ratio is out of range: {input_ratio}. Please use a ratio between 1.0 and 2.")
         return 1
     
-    final_width = 54.0
+    final_width = 52.0
     final_height = final_width / input_ratio
     
     # check .env file

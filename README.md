@@ -167,7 +167,7 @@ Generate your poster with a single command:
 **For UV setup:**
 ```bash
 uv run python -m src.workflow.pipeline \
-  --poster_width 54 --poster_height 36 \
+  --poster_width 52 --poster_height 39 \
   --paper_path ./data/Your_Paper_Name/paper.pdf \
   --text_model gpt-4.1-2025-04-14 \
   --vision_model gpt-4.1-2025-04-14 \
@@ -178,7 +178,7 @@ uv run python -m src.workflow.pipeline \
 **For Conda setup:**
 ```bash
 python -m src.workflow.pipeline `
-  --poster_width 54 --poster_height 36 `
+  --poster_width 52 --poster_height 39 `
   --paper_path ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/paper.pdf `
   --text_model qwen3-max `
   --vision_model qwen3-vl-plus `
