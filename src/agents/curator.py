@@ -94,12 +94,19 @@ class StoryBoardCurator:
                 prompt = Template(self.spatial_planning_prompt).render(**template_data)
                 agent.reset()
                 response = agent.step(prompt)
-                
-                story_board = extract_json(response.content)
+                ###修改的不只是content,token全部换为0
+                with open(Path(state["output_dir"]) / "model_reply_create_story_board.txt", 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    print("successfully read modle's reply of create_story_board")
+                    
+                #story_board = extract_json(response.content)
+                story_board = extract_json(content)
                 
                 if self._validate_story_board(story_board, classified_visuals, visual_context):
                     log_agent_success(self.name, f"successfully created story board on attempt {attempt + 1}")
-                    return story_board, response.input_tokens, response.output_tokens
+                    #return story_board, response.input_tokens, response.output_tokens
+                    return story_board, 0, 0
+                
                 else:
                     log_agent_warning(self.name, f"attempt {attempt + 1}: validation failed, retrying")
                     

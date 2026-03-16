@@ -3,6 +3,7 @@ pdf text and asset extraction
 """
 
 import json
+from os import name
 import random
 import re
 from pathlib import Path
@@ -124,12 +125,18 @@ class Parser:
             try:
                 prompt = Template(self.enhanced_abt_prompt).render(markdown_document=text)
                 agent.reset()
-                response = agent.step(prompt)
-                
-                narrative = extract_json(response.content)
-                
+                #response = agent.step(prompt)
+                ###修改的不只是content,token全部换为0
+                with open(Path(state["output_dir"]) / "model_reply_generate_narrative_content.txt", 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    print("successfully read modle's reply of generate_narrative_content")
+                    
+                #narrative = extract_json(response.content)
+                narrative = extract_json(content)
+
                 if "and" in narrative and "but" in narrative and "therefore" in narrative:
-                    return narrative, response.input_tokens, response.output_tokens
+                    #return narrative, response.input_tokens, response.output_tokens
+                    return narrative, 0, 0
 
             except Exception as e:
                 log_agent_warning(self.name, f"attempt {attempt + 1} failed: {e}")
@@ -277,9 +284,14 @@ class Parser:
             try:
                 prompt = Template(self.title_authors_prompt).render(markdown_document=text)
                 agent.reset()
-                response = agent.step(prompt)
-                
-                result = extract_json(response.content)
+                #response = agent.step(prompt)
+                ###
+                with open(Path(state["output_dir"]) / "model_reply_extract_title_authors.txt", 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    print("successfully read modle's reply of extract_title_authors")
+                #result = extract_json(response.content)
+                result = extract_json(content)
+
 
                 if "title" in result and "authors" in result:
                     title = result["title"].strip()
@@ -329,13 +341,20 @@ class Parser:
                 )
                 
                 agent.reset()
-                response = agent.step(prompt)
-                classification = extract_json(response.content)
+
+                #response = agent.step(prompt)
+                ###修改的不只是content,token全部换为0
+                with open(Path(state["output_dir"]) / "model_reply_classify_visual_assets.txt", 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    print("successfully read modle's reply of classify_visual_assets")
+                #classification = extract_json(response.content)
+                classification = extract_json(content)
                 
                 # validate classification
                 required_keys = ["title_author", "research_background", "research_method", "research_results", "conclusion_outlook"]
                 if all(key in classification for key in required_keys):
-                    return classification, response.input_tokens, response.output_tokens
+                    #return classification, response.input_tokens, response.output_tokens
+                    return classification, 0, 0
                     
             except Exception as e:
                 log_agent_warning(self.name, f"visual classification attempt {attempt + 1} failed: {e}")
@@ -376,10 +395,13 @@ class Parser:
             try:
                 prompt = Template(self.section_extraction_prompt).render(raw_text=raw_text)
                 agent.reset()
-                response = agent.step(prompt)
-                
-                structured_sections = extract_json(response.content)
-                
+                #response = agent.step(prompt)
+                ###修改的不只是content,token全部换为0
+                with open(Path(state["output_dir"]) / "model_reply_extract_structured_sections.txt", 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    print("successfully read modle's reply of extract_structured_sections")
+                #structured_sections = extract_json(response.content)
+                structured_sections = extract_json(content)
                 if self._validate_structured_sections(structured_sections):
                     log_agent_success(self.name, f"extracted {len(structured_sections.get('paper_sections', []))} structured sections")
                     return structured_sections

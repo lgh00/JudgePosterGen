@@ -79,6 +79,7 @@ class PosterState(TypedDict):
     # core paths
     pdf_path: str
     output_dir: str
+    resource_dir: str
     poster_name: str
 
     # model configs
@@ -125,10 +126,11 @@ def create_state(pdf_path: str, text_model: str = "gpt-4.1-2025-04-14", vision_m
 
     poster_name = Path(pdf_path).parent.name or "test_poster"
     output_dir = f"output/{poster_name}"
-
+    resource_dir = "resource"
     return PosterState(
         pdf_path=pdf_path,
         output_dir=output_dir,
+        resource_dir = resource_dir,
         poster_name=poster_name,
         text_model=_get_model_config(text_model),
         vision_model=_get_model_config(vision_model),
