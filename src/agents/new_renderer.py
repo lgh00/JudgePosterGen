@@ -27,6 +27,7 @@ class Renderer:
         """ 一个叫posterlayout,一个叫sectionlayout """
         # load sections information
         section_info = state["story_board"]#这里应该时story_board的数据
+        section_info = self._preprocess_section_info(state, section_info)#预处理，将section_content改为提取内容
         # load poster layout data
         resource_dir = Path(state["resource_dir"])
         layout_dir = resource_dir / "poster_layouts"
@@ -38,7 +39,7 @@ class Renderer:
         self._save_poster_layout_info(state, poster_layout, sorted_area)
 
         print("start_set_layout")
-        sections_layout = self._set_layout(section_info, poster_layout, sorted_area)
+        sections_layout = self._set_layout(state, section_info, poster_layout, sorted_area)
         self._save_section_layout(state, sections_layout)
 
         # render poster
@@ -59,6 +60,16 @@ class Renderer:
         output_dir = Path(state["output_dir"])
         with open(output_dir / "content" / "sections_layout.json", "w", encoding="utf-8") as f:
             json.dump(sections_layout, f, indent=2)
+
+    def _preprocess_section_info(self, state:PosterState, section_info: Dict):
+        new_section_info = section_info.copy()
+        sections = new_section_info["spatial_content_plan"]["sections"]
+        title_author = state["narrative_content"]["meta"]
+        for section in sections:
+            if section["section_title"] == "title_author":
+                section["text_content"] = [title_author["poster_title"], title_author["authors"]]
+        state["story_board"] = new_section_info
+        return new_section_info
 
     def _select_poster_layout(self, state: PosterState, section_info: Dict, poster_layouts_file: Path):
         with open(poster_layouts_file, "r") as f:
@@ -81,8 +92,9 @@ class Renderer:
             section_title = section["section_title"]
             if section_title.lower() == "title_author":
                 title_font_size = 100
+                title_author_content = section["text_content"]
                 visual_assets = section["visual_assets"]
-                text_area = self._caculate_title_text_area(state, title_font_size)
+                text_area = self._caculate_title_text_area(title_author_content, title_font_size)
                 visual_assets_area = self._caculate_visual_area(visual_assets, tables, figures)#这里很可能没有素材，我的想法是后面补上默认图标
                 section_areas[section_title] = visual_assets_area + text_area
                 total_area += visual_assets_area + text_area
@@ -113,15 +125,15 @@ class Renderer:
         print("best layout_id:", layout_id)
         return layout_id, sorted_areas
 
-    def _caculate_title_text_area(self, state:PosterState, title_font_size=100) ->float:
-        title_author = state["narrative_content"]["meta"]
-        title_author_len = len(title_author["poster_title"]) + len(title_author["authors"])
+    def _caculate_title_text_area(self, title_author_content: list, title_font_size=100) ->float:
+        text_len = 0
+        for line in title_author_content:
+            text_len += len(line)
         ratio = title_font_size/72
-        text_area = (ratio*ratio)*title_author_len*(16*12)/(52*39)
-        
+        text_area = (ratio*ratio)*text_len*(16*12)/(52*39)
         return text_area
 
-    def _caculate_visual_area(self, visual_assets: Dict, tables: Dict, figures: Dict) -> float:
+    def _caculate_visual_area(self, visual_assets: list, tables: Dict, figures: Dict) -> float:
         table_area = 0.0
         figure_area = 0.0
         for visual_asset in visual_assets:
@@ -143,7 +155,7 @@ class Renderer:
         total_area = table_area + figure_area
         return total_area
     
-    def _caculate_text_area(self, text_content: Dict, text_font_size=36) -> float:
+    def _caculate_text_area(self, text_content: list, text_font_size=36) -> float:
         """ 计算文本占面积的大小 """
         text_len = 0
         for line in text_content:
@@ -153,7 +165,7 @@ class Renderer:
         total_area = text_area
         return total_area
 
-    def _set_layout(self, section_info: Dict, poster_layout: Dict, sorted_area) -> Dict:
+    def _set_layout(self, state: PosterState, section_info: Dict, poster_layout: Dict, sorted_area) -> Dict:
         sections_layout = []
         sections = section_info["spatial_content_plan"]["sections"]
         for id, info in enumerate(sorted_area):
@@ -164,16 +176,47 @@ class Renderer:
                     section_layout = {
                         "section_title":section_title,
                         "section_content":section["text_content"],
-                        "visual_assets":[item["visual_id"] for item in section["visual_assets"]],
                         "x":section_location[0],
                         "y":section_location[1],
-                        "width":section_location[2] - section_location[0],
-                        "height":section_location[3] - section_location[1],
-                    }
-                    sections_layout.append(section_layout)
+                        "width":section_location[2] - section_location[0] + 1,
+                        "height":section_location[3] - section_location[1] + 1,
+                    }   
+
+                    '''获取视觉素材的布局信息'''
+                    visuals_layout = []
+                    for item in section["visual_assets"]:
+                        visual_id = item["visual_id"]
+                        visual_path, aspect = self._get_visual_path(visual_id, state)
+                        if visual_path and Path(visual_path).exists():
+                            visual_layout = {
+                                "path":visual_path,
+                                "x":section_location[0],
+                                "y":section_location[1],
+                                "width":3,
+                                "height":3/aspect,
+                                "aspect":aspect,
+                            }
+                            visuals_layout.append(visual_layout)
+
+                    section_layout["visuals_layout"] = visuals_layout
+
+            sections_layout.append(section_layout)
         """ 设置海报布局 """
         return sections_layout
-    
+
+    def _get_visual_path(self, visual_id: str, state: PosterState):
+        """get path to visual asset"""
+        images = state.get("images", {})
+        tables = state.get("tables", {})
+        vid = (visual_id or "").split('_')[-1]
+        
+        if visual_id.startswith("figure"):
+            return images.get(vid, {}).get("path"), images.get(vid, {}).get("aspect")
+        if visual_id.startswith("table"):
+            return tables.get(vid, {}).get("path"), tables.get(vid, {}).get("aspect")
+        
+        return None, None
+
     def render_poster(self, state: PosterState, sections_layout: Dict):
         """ 渲染海报 """
         prs = Presentation()
@@ -183,14 +226,19 @@ class Renderer:
 
         ratio = 3.25  # 建议定义为常量，如 RATIO = 3.25
         FONT_SIZE_TITLE = Pt(50)
-        FONT_SIZE_CONTENT = Pt(36) 
+
         for section_layout in sections_layout:
+            if section_layout["section_title"] == "title_author":
+                FONT_SIZE_CONTENT = Pt(100)
+            else:
+                FONT_SIZE_CONTENT = Pt(36)
             x = section_layout["x"]
             y = section_layout["y"]
             width = section_layout["width"]
             height = section_layout["height"]
             
             # 1. 添加矩形容器
+            '''
             container = slide.shapes.add_shape(
                 MSO_SHAPE.RECTANGLE,
                 Inches(x * ratio),
@@ -198,43 +246,200 @@ class Renderer:
                 Inches(width * ratio),
                 Inches(height * ratio)
             )
-            container.line.color.rgb = RGBColor(0, 0, 255)
-            
-            # ========== 核心修复：手动添加文本框 ==========
-            # 检查是否有textbox，没有则手动添加
-            if not hasattr(container, 'textbox') or container.textbox is None:
-                # 在形状内部添加文本框（覆盖整个形状区域）
-                textbox = slide.shapes.add_textbox(
-                    Inches(x * ratio),  # 与形状x坐标一致
-                    Inches(y * ratio),  # 与形状y坐标一致
-                    Inches(width * ratio),  # 与形状宽度一致
-                    Inches(height * ratio)  # 与形状高度一致
-                )
-                # 将文本框置于形状上方（视觉上）
-                #textbox.z_order = container.z_order + 1
-                # 文本框透明背景，不遮挡形状
-                textbox.fill.solid()
-                textbox.fill.fore_color.rgb = RGBColor(255, 255, 255)
-                textbox.fill.fore_color.transparency = 1.0  # 完全透明
-                textbox.line.fill.background()  # 无边框
-            else:
-                textbox = container.textbox
-            # =============================================
-            
-            # 2. 配置文本框架
+            container.line.color.rgb = RGBColor(0, 255, 0)
+            '''
+            # 2.添加区块标题
+            textbox = slide.shapes.add_textbox(
+                Inches(x * ratio),  # 与形状x坐标一致
+                Inches(y * ratio),  # 与形状y坐标一致
+                Inches(width * ratio),  # 与形状宽度一致
+                Inches(height * ratio)  # 与形状高度一致
+            )
+            textbox.fill.solid()
+            textbox.fill.fore_color.rgb = RGBColor(255, 255, 255)
+            textbox.fill.fore_color.transparency = 1.0  # 完全透明
+            textbox.line.fill.background()  # 无边框
+
             tf = textbox.text_frame
             tf.clear()  # 清空默认文本
             tf.vertical_anchor = MSO_VERTICAL_ANCHOR.TOP  # 垂直锚点（text_frame属性）
             tf.word_wrap = True  # 自动换行（新增，避免文本溢出）
-            
-            # 3. 设置标题段落
+
             title_para = tf.add_paragraph()  # 重新创建标题段落（避免默认段落问题）
             title_para.text = section_layout["section_title"]
             title_para.font.size = FONT_SIZE_TITLE
             title_para.font.bold = True
             title_para.alignment = PP_ALIGN.CENTER
+            '''设置子标题后，整个区块的起始位置和高度都应该变动，单位为格子'''
+            sub_title_height = 1/ratio
+            y += sub_title_height
+            height -= sub_title_height
+
+            # 3. 处理图片放置
+            '''处理图片放置'''
+            visual_assets_num = len(section_layout["visuals_layout"])
+            if visual_assets_num == 0:
+                pass
+            elif visual_assets_num == 1:
+                visual_asset = section_layout["visuals_layout"][0]
+                visual_path = visual_asset["path"]
+                visual_width = visual_asset["width"]
+                visual_height = visual_asset["height"]
+                if visual_width < width and visual_height < height:
+                    strategy = "up" if (height-visual_height)*width > (width-visual_width)*height else "left"
+                    if strategy == "up":
+                        print(f"{section_layout['section_title']}的策略为up")
+                        centered_left = Inches((x + (width - visual_width) / 2) * ratio)
+                        centered_top = Inches(y * ratio)
+                        final_width = Inches(visual_width * ratio)
+                        final_height = Inches(visual_height * ratio)
+                        slide.shapes.add_picture(visual_path, centered_left, centered_top, width=final_width, height=final_height)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        y += final_height
+                        height -= final_height
+                    elif strategy == "left":
+                        print(f"{section_layout['section_title']}的策略为left")
+                        centered_left = Inches(x * ratio)
+                        centered_top = Inches((y + (height - visual_height) / 2) * ratio)
+                        final_width = Inches(visual_width * ratio)
+                        final_height = Inches(visual_height * ratio)
+                        slide.shapes.add_picture(visual_path, centered_left, centered_top, width=final_width, height=final_height)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        x += final_width
+                        width -= final_width
+            elif visual_assets_num == 2:
+                fine_to_place = True
+                strategy = ""
+                text_area = 0
+                for visual_asset in section_layout["visuals_layout"]:
+                    visual_width = visual_asset["width"]
+                    visual_height = visual_asset["height"]
+                    if visual_width > width or visual_height > height:
+                        fine_to_place = False
+                        break
+                if fine_to_place:
+                    visual_asset1 = section_layout["visuals_layout"][0]
+                    visual_path1 = visual_asset1["path"]
+                    visual_width1 = visual_asset1["width"]
+                    visual_height1 = visual_asset1["height"]
+                    visual_asset2 = section_layout["visuals_layout"][1]
+                    visual_path2 = visual_asset2["path"]
+                    visual_width2 = visual_asset2["width"]
+                    visual_height2 = visual_asset2["height"]
+                    pdb.set_trace()
+                    if visual_height1+visual_height2 < height:
+                        caculated_text_area = width * (height - visual_height1 - visual_height2)
+                        if caculated_text_area > text_area:
+                            text_area = caculated_text_area
+                            strategy = "up1"
+                    if visual_asset1["width"] + visual_asset2["width"] < width:
+                        caculated_text_area = width * (height - max(visual_asset1["height"], visual_asset2["height"]))
+                        if caculated_text_area > text_area:
+                            text_area = caculated_text_area
+                            strategy = "up2"
+                    
+                    if visual_width1+visual_width2 < width:
+                        caculated_text_area = height * (width - visual_width1 - visual_width2)
+                        if caculated_text_area > text_area:
+                            text_area = caculated_text_area
+                            strategy = "left1"
+                    if visual_asset1["height"] + visual_asset2["height"] < height:
+                        caculated_text_area = height * (width - max(visual_asset1["width"], visual_asset2["width"]))
+                        if caculated_text_area > text_area:
+                            text_area = caculated_text_area
+                            strategy = "left2"
+                    if strategy == "":
+                        pass
+                    elif strategy == "up1":
+                        print(f"{section_layout['section_title']}的策略为{strategy}")
+                        centered_left1 = Inches((x + (width - visual_width1) / 2) * ratio)
+                        centered_top1 = Inches(y * ratio)
+                        final_width1 = Inches(visual_width1 * ratio)
+                        final_height1 = Inches(visual_height1 * ratio)
+                        slide.shapes.add_picture(visual_path1, centered_left1, centered_top1, width=final_width1, height=final_height1)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        y += visual_height1
+                        height -= visual_height1
+                        centered_left2 = Inches((x + (width - visual_width2) / 2) * ratio)
+                        centered_top2 = Inches(y * ratio)
+                        final_width2 = Inches(visual_width2 * ratio)
+                        final_height2 = Inches(visual_height2 * ratio)
+                        slide.shapes.add_picture(visual_path2, centered_left2, centered_top2, width=final_width2, height=final_height2)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        y += visual_height2
+                        height -= visual_height2
+                    elif strategy == "up2":
+                        print(f"{section_layout['section_title']}的策略为{strategy}")
+                        centered_left1 = Inches((x + (width/2 - visual_width1)/2) * ratio)
+                        centered_top1 = Inches(y * ratio)
+                        final_width1 = Inches(visual_width1 * ratio)
+                        final_height1 = Inches(visual_height1 * ratio)
+                        slide.shapes.add_picture(visual_path1, centered_left1, centered_top1, width=final_width1, height=final_height1)
+                        centered_left2 = Inches((x + width/2 + (width/2 - visual_width2)/2) * ratio)
+                        centered_top2 = Inches(y * ratio)
+                        final_width2 = Inches(visual_width2 * ratio)
+                        final_height2 = Inches(visual_height2 * ratio)
+                        slide.shapes.add_picture(visual_path2, centered_left2, centered_top2, width=final_width2, height=final_height2)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        y += max(visual_height1, visual_height2)
+                        height -= max(visual_height1, visual_height2)
+                    elif strategy == "left1":
+                        print(f"{section_layout['section_title']}的策略为{strategy}")
+                        centered_left1 = Inches(x * ratio)
+                        centered_top1 = Inches((y + (height - visual_height1) / 2) * ratio)
+                        final_width1 = Inches(visual_width1 * ratio)
+                        final_height1 = Inches(visual_height1 * ratio)
+                        slide.shapes.add_picture(visual_path1, centered_left1, centered_top1, width=final_width1, height=final_height1)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        x += visual_width1
+                        width -= visual_width1
+                        centered_left2 = Inches(x * ratio)
+                        centered_top2 = Inches((y + (height - visual_height2) / 2) * ratio)
+                        final_width2 = Inches(visual_width2 * ratio)
+                        final_height2 = Inches(visual_height2 * ratio)
+                        slide.shapes.add_picture(visual_path2, centered_left2, centered_top2, width=final_width2, height=final_height2)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        x += visual_width2
+                        width -= visual_width2
+                    elif strategy == "left2":
+                        print(f"{section_layout['section_title']}的策略为{strategy}")
+                        centered_left1 = Inches(x * ratio)
+                        centered_top1 = Inches((y + (height/2 - visual_height1)/2) * ratio)
+                        final_width1 = Inches(visual_width1 * ratio)
+                        final_height1 = Inches(visual_height1 * ratio)
+                        slide.shapes.add_picture(visual_path1, centered_left1, centered_top1, width=final_width1, height=final_height1)
+                        centered_left2 = Inches(x * ratio)
+                        centered_top2 = Inches((y + height/2 + (height/2 - visual_height2)/2) * ratio)
+                        final_width2 = Inches(visual_width2 * ratio)
+                        final_height2 = Inches(visual_height2 * ratio)
+                        slide.shapes.add_picture(visual_path2, centered_left2, centered_top2, width=final_width2, height=final_height2)
+                        '''设置图片后，整个区块的起始位置和高度都应该变动，单位为格子'''
+                        x += max(visual_width1, visual_width2)
+                        width -= max(visual_width1, visual_width2)
+                
+            # 在形状内部添加文本框（覆盖整个形状区域）
+            textbox = slide.shapes.add_textbox(
+                Inches(x * ratio),  # 与形状x坐标一致
+                Inches(y * ratio),  # 与形状y坐标一致
+                Inches(width * ratio),  # 与形状宽度一致
+                Inches(height * ratio)  # 与形状高度一致
+            )
+            # 将文本框置于形状上方（视觉上）
+            # 文本框透明背景，不遮挡形状
+            textbox.fill.solid()
+            textbox.fill.fore_color.rgb = RGBColor(255, 255, 255)
+            textbox.fill.fore_color.transparency = 1.0  # 完全透明
+            textbox.line.fill.background()  # 无边框
+
+            # =============================================
+            # 4. 配置文本框架
+            tf = textbox.text_frame
+            tf.clear()  # 清空默认文本
+            tf.vertical_anchor = MSO_VERTICAL_ANCHOR.TOP  # 垂直锚点（text_frame属性）
+            tf.word_wrap = True  # 自动换行（新增，避免文本溢出）
             
-            # 4. 添加内容段落
+            
+            # 5. 添加内容段落
             for line in section_layout["section_content"]:
                 content_para = tf.add_paragraph()
                 content_para.text = line
@@ -254,3 +459,10 @@ def renderer_node(state: PosterState) -> Dict[str, Any]:
         "current_agent": result["current_agent"],
         "errors": result["errors"]
     }
+
+for i in range(10):
+    if i == 0:
+        print
+    else:
+        print(i)
+    print("---")
