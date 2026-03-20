@@ -3,6 +3,7 @@ import qrcode
 from pathlib import Path
 from typing import Dict, Any, Optional
 import json
+import numpy as np
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
@@ -113,16 +114,25 @@ class Renderer:
         sorted_areas = sorted(section_areas.items(), key=lambda x: x[1])
 
         layout_id = 0
-        min_area_similarity = 10000
+        min_area_dissimilarity = 10000
+        dissimilaritys = []
         for layout_data in poster_layouts_data:
-            area_simlarity = 0.0
+            area_dissimilarity = 0.0
             rate = layout_data["rate"]
             for section_area_rate, poster_layout_rate in zip(sorted_areas, rate):
-                area_simlarity += abs(section_area_rate[1] - poster_layout_rate)
-            if area_simlarity < min_area_similarity:
-                min_area_similarity = area_simlarity
+                area_dissimilarity += abs(section_area_rate[1] - poster_layout_rate)
+            dissimilaritys.append(area_dissimilarity)
+            if area_dissimilarity < min_area_dissimilarity:
+                min_area_dissimilarity = area_dissimilarity
                 layout_id = layout_data["id"]
-        print("best layout_id:", layout_id)
+        print("method1 layout_id:", layout_id)
+        '''
+        dissimilarity = np.array(dissimilaritys)
+        min_indices = np.argpartition(dissimilarity, 20)[:20]
+        layout_id = min_indices[0]
+        print("min_indices:", min_indices)
+        print("method2 layout_id:", layout_id)
+        '''
         return layout_id, sorted_areas
 
     def _caculate_title_text_area(self, title_author_content: list, title_font_size=100) ->float:
@@ -237,17 +247,6 @@ class Renderer:
             width = section_layout["width"]
             height = section_layout["height"]
             
-            # 1. 添加矩形容器
-            '''
-            container = slide.shapes.add_shape(
-                MSO_SHAPE.RECTANGLE,
-                Inches(x * ratio),
-                Inches(y * ratio),
-                Inches(width * ratio),
-                Inches(height * ratio)
-            )
-            container.line.color.rgb = RGBColor(0, 255, 0)
-            '''
             # 2.添加区块标题
             textbox = slide.shapes.add_textbox(
                 Inches(x * ratio),  # 与形状x坐标一致
@@ -326,7 +325,6 @@ class Renderer:
                     visual_path2 = visual_asset2["path"]
                     visual_width2 = visual_asset2["width"]
                     visual_height2 = visual_asset2["height"]
-                    pdb.set_trace()
                     if visual_height1+visual_height2 < height:
                         caculated_text_area = width * (height - visual_height1 - visual_height2)
                         if caculated_text_area > text_area:

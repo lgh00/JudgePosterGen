@@ -183,8 +183,8 @@ class ColorAgent:
         g = int(hex_color[2:4], 16)
         b = int(hex_color[4:6], 16)
         
-        comp_r, comp_g, comp_b = self._generate_complementary_color(r, g, b)
-        contrast_color = self._reduce_saturation_brightness(comp_r, comp_g, comp_b)
+        comp_r, comp_g, comp_b = self._generate_complementary_color(r, g, b)#生成补色
+        contrast_color = self._reduce_saturation_brightness(comp_r, comp_g, comp_b)#调整补色亮度
         
         color_scheme["contrast"] = contrast_color
         return color_scheme
