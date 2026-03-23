@@ -1,0 +1,160 @@
+{
+    "section_layout_subtitles":{
+        "2":{
+            "style":"Simple Core Type",
+            "section_type":["title_author","core_research_findings_conclusion"]
+        },
+        "3":{
+            "style":"Basic Complete Type",
+            "section_type":["title_author","research_background", "research_findings_key_conclusions"]
+        },
+        "4":{
+            "style":"Logical progressive type",
+            "section_type":["title_author","research_method_experimental_design", "core_research_results", "conclusion_outlook"]
+        },
+        "5":{
+            "style":"Refined process type",
+            "section_type":["title_author","research_background_research_objectives", "research_method_experimental_design", "research_results_data_analysis", "conclusion_outlook"]
+        },
+        "6":{
+            "style":"Comprehensive and detailed type",
+            "section_type":["title_author","research_background_research_status", "research_objective_core_hypothesis", "research_method_experimental_design", "research_results_data_analysis", "conclusion_outlook"]
+        },
+        "7":{
+            "style":"Precise segmentation type",
+            "section_type":["title_author","research_background_research_status", "research_significance", "research_method_related_work", "experimental_design_data_source", "research_results_data_analysis", "conclusion_outlook"]
+        },
+        "8":{
+            "style":"Ultra-detailed type",
+            "section_type":["title_author","research_background_research_status", "theoretical_research_significance", "practical_research_significance", "research_method_related_work", "experimental_design_data_source", "research_results_data_analysis", "conclusion_outlook"]
+        }
+    },
+    "section_layout_config":{
+        "2":{
+            "style":"Simple Core Type",
+            "section_type":["title_author","core_research_findings_conclusion"],
+            "section_core_content":{
+                "title_author":"Display paper title and author information",
+                "core_research_findings_conclusion":"Present the core achievements of this study (key data, experimental conclusions, important findings, etc.), summarize the core conclusions, clarify the key problems solved and research objectives achieved; briefly prospect the future directions, application scenarios or areas to be improved to form a complete research closed loop"
+            },
+            "visual_assets_classification_criteria":{
+                "title_author":"Typesetting and template materials used to display core identifiers such as title, author, and institution",
+                "core_research_findings_conclusion":"Charts or illustrations used to display research experimental data, core findings, and important conclusions"
+            }
+        },
+        "3":{
+            "style":"Basic Complete Type",
+            "section_type":["title_author","research_background", "research_findings_key_conclusions"],
+            "section_core_content":{
+                "title_author":"Display paper title and author information",
+                "research_background":"Explain the background and existing problems of the research field, and clarify the core objectives and key problems to be solved in this study",
+                "research_findings_key_conclusions":"Show core research achievements and key data, summarize the main conclusions, and clarify the research value"
+            },
+            "visual_assets_classification_criteria":{
+                "title_author":"Typesetting and template materials used to display core identifiers such as title, author, and institution",
+                "research_background":"Schematic diagrams, literature charts or simple illustrations used to display the research field background, existing problems and research objectives",
+                "research_findings_key_conclusions":"Data visualization charts, experimental result charts or summary illustrations used to display core research findings, key data and research value"
+            }
+        },
+        "4":{
+            "style":"Logical progressive type",
+            "section_type":["title_author","research_method_experimental_design", "core_research_results", "conclusion_outlook"],
+            "section_core_content":{
+                "title_author":"Display paper title and author information",
+                "research_method_experimental_design":"Describe the core methods, experimental design ideas, data collection and processing methods adopted in the research",
+                "core_research_results":"Present the key findings, critical data and phased achievements of the research",
+                "conclusion_outlook":"Summarize the core conclusions and briefly prospect the future expansion directions or application scenarios of the research"
+            },
+            "visual_assets_classification_criteria":{
+                "title_author":"Typesetting and template materials used to display core identifiers such as title, author, and institution",
+                "research_method_experimental_design":"Schematic diagrams, flow charts or technical path diagrams used to display research methods, experimental design processes, and data collection and processing methods",
+                "core_research_results":"Data visualization charts and experimental result charts used to display core research discoveries, key data and phased achievements",
+                "conclusion_outlook":"Summary charts or simple illustrations used to display core research conclusions, follow-up expansion directions and application scenarios"
+            }
+        },
+        "5":{
+            "style":"Refined process type",
+            "section_type":["title_author","research_background_research_objectives", "research_method_experimental_design", "research_results_data_analysis", "conclusion_outlook"],
+            "section_core_content":{
+                "title_author":"Display paper title and author information",
+                "research_background_research_objectives":"Briefly describe the background and existing pain points of the research field, and clarify the specific objectives and expected effects of this study",
+                "research_method_experimental_design":"Introduce the research methods, experimental design framework and core technical routes adopted",
+                "research_results_data_analysis":"Show research results and conduct quantitative analysis combined with data to demonstrate the effectiveness and credibility of the achievements",
+                "conclusion_outlook":"Summarize the core conclusions and propose future optimization directions or practical application scenarios"
+            },
+            "visual_assets_classification_criteria":{
+                "title_author":"Typesetting and template materials used to display core identifiers such as title, author, and institution",
+                "research_background_research_objectives":"Schematic diagrams, background illustrations or problem-oriented materials used to display the research field background, existing pain points and research objectives",
+                "research_method_experimental_design":"Flow charts and technical schematic diagrams used to display research methods, experimental design frameworks and core technical paths",
+                "research_results_data_analysis":"High-precision data visualization charts and experimental analysis charts used to display research findings and quantitative analysis data",
+                "conclusion_outlook":"Summary charts or application scenario illustrations used to display core research conclusions, follow-up optimization directions and application landing scenarios"
+            }
+        },
+        "6":{
+            "style":"Comprehensive and detailed type",
+            "section_type":["title_author","research_background_research_status", "research_objective_core_hypothesis", "research_method_experimental_design", "research_results_data_analysis", "conclusion_outlook"],
+            "section_core_content":{
+                "title_author":"Display paper title and author information",
+                "research_background_research_status":"Elaborate the development background of the research field and sort out the progress and deficiencies of current similar studies",
+                "research_objective_core_hypothesis":"Clarify the specific objectives of this study and put forward the core hypotheses and verification directions",
+                "research_method_experimental_design":"Detail the research methods, experimental design details and verification schemes",
+                "research_results_data_analysis":"Present specific research results and demonstrate the scientificity and value through data analysis",
+                "conclusion_outlook":"Summarize research conclusions, verify core hypotheses, and prospect the extension directions and application value"
+            },
+            "visual_assets_classification_criteria":{
+                "title_author":"Typesetting and template materials used to display core identifiers such as title, author, and institution",
+                "research_background_research_status":"Literature review charts and comparison schematic diagrams used to display the development background of the research field, the progress and deficiencies of similar research",
+                "research_objective_core_hypothesis":"Simple schematic diagrams and hypothesis extraction materials used to display the specific objectives, core hypotheses and verification directions of the research",
+                "research_method_experimental_design":"Detailed flow charts and technical schematic diagrams used to display research method details, experimental design processes and verification schemes",
+                "research_results_data_analysis":"Data visualization charts and experimental demonstration charts used to display specific research findings, data analysis processes and the value of the findings",
+                "conclusion_outlook":"Summary charts and application value illustrations used to display research conclusions, core hypothesis verification results and extension directions"
+            }
+        },
+        "7":{
+            "style":"Precise segmentation type",
+            "section_type":["title_author","research_background_research_status", "research_significance", "research_method_related_work", "experimental_design_data_source", "research_results_data_analysis", "conclusion_outlook"],
+            "section_core_content":{
+                "title_author":"Display paper title and author information",
+                "research_background_research_status":"Analyze the background of the research field and sort out the achievements and breakthrough points of existing studies",
+                "research_significance":"Explain the theoretical and practical value of this study and its promoting effect on the development of the field",
+                "research_method_related_work":"Introduce the core methods adopted and compare the advantages, disadvantages and innovations with similar related work",
+                "experimental_design_data_source":"Detail the experimental design process, parameter settings, and explain the data source, collection method and reliability",
+                "research_results_data_analysis":"Comprehensively show research results and demonstrate the effectiveness and innovation through multi-dimensional data analysis",
+                "conclusion_outlook":"Summarize core conclusions, point out limitations, and prospect future research directions and application scenarios"
+            },
+            "visual_assets_classification_criteria":{
+                "title_author":"Typesetting and template materials used to display core identifiers such as title, author, and institution",
+                "research_background_research_status":"Schematic diagrams and comparison charts used to display the background environment of the research field, the achievements and breakthrough points of existing research",
+                "research_significance":"Value extraction illustrations and summary charts used to display the theoretical and practical value of the research and its promoting effect on the development of the field",
+                "research_method_related_work":"Method schematic diagrams and comparison charts used to display core research methods, the comparison of similar related work and innovation points",
+                "experimental_design_data_source":"Detailed flow charts and data source explanation charts used to display the experimental design process, parameter settings and data sources",
+                "research_results_data_analysis":"Data visualization charts and experimental comparison charts used to comprehensively display research findings, multi-dimensional data analysis and innovation",
+                "conclusion_outlook":"Summary charts and future outlook illustrations used to display core research conclusions, limitations and follow-up directions"
+            }
+        },
+        "8":{
+            "style":"Ultra-detailed type",
+            "section_type":["title_author","research_background_research_status", "theoretical_research_significance", "practical_research_significance", "research_method_related_work", "experimental_design_data_source", "research_results_data_analysis", "conclusion_outlook"],
+            "section_core_content":{
+                "title_author":"Display paper title and author information",
+                "research_background_research_status":"Briefly describe the research field background and summarize the current status and problems to be solved",
+                "theoretical_research_significance":"Explain the value of the research in supplementing, improving or innovating the theoretical system of the field",
+                "practical_research_significance":"Elaborate the practical application value of the research results and the real problems solved",
+                "research_method_related_work":"Introduce the methodological system adopted and highlight the methodological innovations by comparing with related work",
+                "experimental_design_data_source":"Explain the experimental design ideas and core processes, and indicate the data source and quality assurance methods",
+                "research_results_data_analysis":"Present core research results and demonstrate scientificity and practicality through data analysis",
+                "conclusion_outlook":"Summarize research conclusions, sort out innovations and deficiencies, and prospect the application and iteration directions of the results"
+            },
+            "visual_assets_classification_criteria":{
+                "title_author":"Typesetting and template materials used to display core identifiers such as title, author, and institution",
+                "research_background_research_status":"Schematic diagrams and background illustrations used to display the research field background, current research status and problems to be solved",
+                "theoretical_research_significance":"Theoretical schematic diagrams and innovation point extraction illustrations used to display the supplementary, improvement and innovative value of the research to the field's theoretical system",
+                "practical_research_significance":"Application scenario illustrations and practical landing schematic diagrams used to display the practical application value of research findings and the practical problems solved",
+                "research_method_related_work":"Method schematic diagrams and comparison charts used to display the research method system, the comparison of related work and method innovation points",
+                "experimental_design_data_source":"Flow charts and explanation charts used to display experimental design ideas, core processes and data quality assurance methods",
+                "research_results_data_analysis":"Data visualization charts and experimental verification charts used to display core research findings, data analysis and scientificity and practicality",
+                "conclusion_outlook":"Summary charts and iteration outlook illustrations used to display research conclusions, innovation points and deficiencies, and the application and iteration directions of the findings"
+            }
+        }
+    }
+}

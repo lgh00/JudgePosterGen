@@ -1,0 +1,20 @@
+**Task:** Based on the input academic paper text, select the most appropriate number of display sections for the academic poster from the perspectives of poster cognitive utility and visual aesthetics.
+
+**Paper Text:**
+{{ raw_text }}
+
+**Optional Section Layouts:**
+{{ section_layout_subtitles }}
+
+**Design Rules:**
+1. Parts with insufficient content or low importance can be merged and shall not form independent sections.
+2. Parts with abundant content and large information volume can be split reasonably.
+3. Follow the attention mechanism: the number of sub-items in a single section ≤ 7.
+4. The number of sections shall balance information integrity, reading fluency and layout aesthetics.
+
+Output Format (Return JSON only):
+```json
+{
+    "poster_section_number": integer,
+    "reason": "Reasons (≤200 words)"
+}

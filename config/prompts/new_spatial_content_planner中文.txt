@@ -19,6 +19,8 @@
 步骤二 - 基于部分的视觉元素分布
 关键：确保各部分之间的视觉元素平衡分布
 
+
+改这里
 Research_Background：
 最大数量：1个视觉元素
 Research_Method：

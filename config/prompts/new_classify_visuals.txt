@@ -1,29 +1,17 @@
-Combined with the 5 core modules of an academic poster (Title & Authors, Research Background & Objectives, Research Methods & Technical Routes, Research Results & Analysis, Conclusions & Future Outlook), visual materials are to be accurately classified according to the functional attributes of each module. Each material must correspond to a unique module to align with the display requirements of each module, thereby facilitating clear logic and intuitive visual presentation of the poster.
+Combined with the classification requirements of the academic poster sections ({{ section_subtitles }}), accurately classify the visual materials according to the section functions, ensure that each material corresponds to a unique section, conform to the display needs of each module, and help the poster achieve clear logic and intuitive visualization.
 
 Available visuals with captions:
 {{ visuals_list }}
 
-In accordance with the display requirements of the five poster modules, each visual material shall be accurately categorized into a unique category, with each category corresponding to one core module of the poster and is tailored to the content and display position requirements of that module.
+According to the display requirements of each section of the poster, adapt the section content to the display needs, and accurately classify each visual asset into a unique section.
 
-**Categories Divided by Poster Modules**
-1.**"title_author_visual"** - Adapted to the "Title & Authors" Module
-Core Material Types: Schematic diagrams of the paper title layout, typesetting templates for authors' names and affiliations, display templates for corresponding author information, and supplementary schematic diagrams for supervisor information. These materials shall be concise and eye-catching, emphasize the core identification function of the module.
-2.**"research_background_visual"** - Adapted to the "Research Background & Objectives" Module
-Core Material Types: Schematic diagrams showing the current status of the research field, visual charts highlighting research gaps/key issues, breakdown diagrams illustrating research value, and minimalist illustrations of the industry background. These materials should be concise and intuitive, helping to refine research pain points and significance, while enabling the audience to quickly grasp the necessity of the research.
-3.**"research_method_visual"** - Adapted to the "Research Methods & Technical Routes" Module
-Core Material Types: Schematic diagrams of core research methods, flowcharts of technical routes, framework diagrams of experimental designs, algorithm architecture diagrams, and system schematic diagrams. Details may be simplified to highlight core processes and logic, reflecting the scientific rigor of the research.
-4.**"research_results_visual"** - Adapted to the "Research Results & Analysis" Module
-Core Material Types: Core experimental result charts (bar charts, line charts, pie charts, etc.), key data visualization graphs, schematic diagrams of experimental conclusions, comparison charts with benchmark models, ablation experiment charts, verification and analysis charts. Key data shall be labeled, with a focus on highlighting core outputs relevant to research objectives and avoiding redundant information.
-5.**"conclusion_outlook_visual"** - Adapted to the "Conclusions & Future Outlook" Module
-Core Material Types: Schematic diagrams summarizing research conclusions, flow charts of follow-up research directions, visualization graphs of application scenarios, and schematic diagrams of research closure. These materials should concisely present research conclusions and future directions, enhancing the academic integrity of the poster.
+**section content information:**
+
+{{ section_core_content }}
 
 **Classification Guidelines**
 
-Adapted to the "title_author_visual" Module: Typesetting or template-based materials used to display core identifiers such as titles, authors, and affiliations → classified as title_author_visual;
-Adapted to the "research_background_visual" Module: Charts or illustrations displaying the current status, problems, and value of the research field → classified as research_background_visual;
-Adapted to the "research_method_visual" Module: Schematic diagrams or flow charts displaying research methods, technical processes, and experimental design → classified as research_method_visual;
-Adapted to the "research_results_visual" Module: Charts or schematic diagrams displaying core experimental data and research findings → classified as research_results_visual;
-Adapted to the "conclusion_outlook_visual" Module: Schematic diagrams displaying research conclusions, follow-up directions, and application scenarios → classified as conclusion_outlook_visual;
+{{ visual_assets_classification_criteria }}
 Supplementary Note: If a material applies to multiple modules simultaneously, it should be prioritized to be classified into the module that best reflects its core value, ensuring that each material belongs to only one category.
 
 **Consideration Points**
@@ -32,12 +20,7 @@ Supplementary Note: If a material applies to multiple modules simultaneously, it
 - Visual impact and audience comprehension
 
 Required Output JSON Format:
-{
-  "title_author": ["visual_id1", ...],
-  "research_background": ["visual_id1", ...],
-  "research_method": ["visual_id1", ...],
-  "research_results": ["visual_id1", ...],
-  "conclusion_outlook": ["visual_id1", ...],
-}
+
+{{ json_format }}
 
 Ensure every visual_id appears exactly once across all categories. If there are no materials corresponding to a category, the field for that category shall be filled with an empty array [], and no invalid content shall be entered.

@@ -9,11 +9,7 @@ Extract the specified structure from the academic paper and organize its content
 **Section Extraction Guidelines:**
 
 1. **Identify below Sections:**
-    - title_author
-    - research_background
-    - research_method
-    - research_results
-    - conclusion_outlook
+{{ input_subtitles }}
 
 2. **Content Processing:**
    - Extract the main content for each section

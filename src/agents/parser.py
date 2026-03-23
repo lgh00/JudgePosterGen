@@ -42,6 +42,7 @@ class Parser:
         self.enhanced_abt_prompt = load_prompt("config/prompts/narrative_abt_extraction.txt")
         self.visual_classification_prompt = load_prompt("config/prompts/new_classify_visuals.txt")#修改了
         self.title_authors_prompt = load_prompt("config/prompts/extract_title_authors.txt")
+        self.poster_section_number_prompt = load_prompt("config/prompts/choose_poster_section_number.txt")#新加入
         self.section_extraction_prompt = load_prompt("config/prompts/new_extract_structured_sections.txt")#修改了
     
     def __call__(self, state: PosterState) -> PosterState:
@@ -61,10 +62,15 @@ class Parser:
             
             title, authors = self._extract_title_authors(raw_text, state["text_model"], state)
 
+            # extract poster section number
+            poster_section_number_content, inp_tok, out_tok = self._choose_poster_section_number(raw_text, state["text_model"], state)
+            section_number = poster_section_number_content["poster_section_number"]
+            state["tokens"].add_text(inp_tok, out_tok)
+            
             narrative_content, inp_tok, out_tok = self._generate_narrative_content(raw_text, state["text_model"], state)
             state["tokens"].add_text(inp_tok, out_tok)
 
-            classified_visuals, inp_tok2, out_tok2 = self._classify_visual_assets(figures, tables, raw_text, state["text_model"], state)
+            classified_visuals, inp_tok2, out_tok2 = self._classify_visual_assets(figures, tables, raw_text, section_number, state["text_model"], state)
             state["tokens"].add_text(inp_tok2, out_tok2)
 
             narrative_content["meta"] = {
@@ -72,9 +78,10 @@ class Parser:
                 "authors": authors
             }
 
-            structured_sections = self._extract_structured_sections(raw_text, state["text_model"], state)
+            structured_sections = self._extract_structured_sections(raw_text, section_number, state["text_model"], state)
             
             # save artifacts and update state
+            self._save_content(poster_section_number_content, "poster_section_number.json", content_dir)
             self._save_content(narrative_content, "narrative_content.json", content_dir)
             self._save_content(classified_visuals, "classified_visuals.json", content_dir)
             self._save_content(structured_sections, "structured_sections.json", content_dir)
@@ -116,6 +123,39 @@ class Parser:
         
         raw_result = (document, rendered, images)
         return text, raw_result
+
+    def _choose_poster_section_number(self, text: str, config, state) -> Tuple[Dict, int, int]:
+        log_agent_info(self.name, "choosing poster section number")
+        agent = LangGraphAgent("expert poster design consultant", config, state, "parser")
+        with open("config/prompts/section_number_config.json", 'r', encoding='utf-8') as f:
+            section_number_config = json.load(f)
+        
+        section_layout_subtitles = section_number_config["section_layout_subtitles"]
+        template_data = {
+            "section_layout_subtitles": json.dumps(section_layout_subtitles, indent=2),
+            "raw_text": text
+        }
+
+        for attempt in range(3):
+            try:
+                prompt = Template(self.poster_section_number_prompt).render(**template_data)
+                agent.reset()
+
+                #response = agent.step(prompt)
+                with open(Path(state["output_dir"]) / "model_reply_choose_poster_section_number.txt", 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    print("successfully read modle's reply of choose_poster_section_number")
+                #content = extract_json(response.content)
+                poster_section_number_content = extract_json(content)
+                if "poster_section_number" in poster_section_number_content and "reason" in poster_section_number_content:
+                    #return poster_section_number_content, response.input_tokens, response.output_tokens
+                    return poster_section_number_content, 0, 0
+
+            except Exception as e:
+                log_agent_warning(self.name, f"attempt {attempt + 1} failed: {e}")
+                if attempt == 2:
+                    raise
+        raise ValueError("failed to choose poster section number after 3 attempts")
 
     def _generate_narrative_content(self, text: str, config, state) -> Tuple[Dict, int, int]:
         log_agent_info(self.name, "generating abt narrative")
@@ -309,7 +349,7 @@ class Parser:
         return "Untitled", "Authors not found"
     
     
-    def _classify_visual_assets(self, figures: Dict, tables: Dict, raw_text: str, config, state) -> Tuple[Dict, int, int]:
+    def _classify_visual_assets(self, figures: Dict, tables: Dict, raw_text: str, section_number: int, config, state) -> Tuple[Dict, int, int]:
         # combine all visuals for classification
         all_visuals = []
         for fig_id, fig_data in figures.items():
@@ -333,13 +373,36 @@ class Parser:
             
         log_agent_info(self.name, f"classifying {len(all_visuals)} visual assets")
         agent = LangGraphAgent("expert poster designer", config, state, "parser")
-        
+        with open("config/prompts/section_number_config.json", 'r', encoding='utf-8') as f:
+            section_number_config = json.load(f)
+        section_layout_config = section_number_config["section_layout_config"][str(section_number)]
+        section_subtitles = ''
+        for subtitle in section_layout_config["section_type"]:
+            section_subtitles += f"{subtitle}, "
+        section_subtitles = section_subtitles[:-2]
+        section_core_content = ''
+        for subtitle, core_content in section_layout_config["section_core_content"].items():
+            section_core_content += f"\"{subtitle}\": {core_content},\n"
+        section_core_content = section_core_content[:-2]
+        visual_assets_classification_criteria = ''
+        for subtitle, classification_criteria in section_layout_config["visual_assets_classification_criteria"].items():
+            visual_assets_classification_criteria += f"\"{subtitle}\": {classification_criteria},\n"
+        visual_assets_classification_criteria = visual_assets_classification_criteria[:-2]
+        json_format = '{\n'
+        for subtitle in section_layout_config["section_type"]:
+            json_format += f"  \"{subtitle}\": [\"visual_id1\", ...],\n"
+        json_format += '}'
+        template_data = {
+            "section_subtitles": section_subtitles,
+            "visuals_list": json.dumps(all_visuals, indent=2),
+            "section_core_content": section_core_content,
+            "visual_assets_classification_criteria": visual_assets_classification_criteria,
+            "json_format": json_format
+        }
+
         for attempt in range(3):
             try:
-                prompt = Template(self.visual_classification_prompt).render(
-                    visuals_list=json.dumps(all_visuals, indent=2)
-                )
-                
+                prompt = Template(self.visual_classification_prompt).render(**template_data)
                 agent.reset()
 
                 #response = agent.step(prompt)
@@ -351,7 +414,7 @@ class Parser:
                 classification = extract_json(content)
                 
                 # validate classification
-                required_keys = ["title_author", "research_background", "research_method", "research_results", "conclusion_outlook"]
+                required_keys = section_layout_config["section_type"]
                 if all(key in classification for key in required_keys):
                     #return classification, response.input_tokens, response.output_tokens
                     return classification, 0, 0
@@ -387,13 +450,25 @@ class Parser:
         '''
         return classification
 
-    def _extract_structured_sections(self, raw_text: str, config, state) -> Dict:
+    def _extract_structured_sections(self, raw_text: str, section_number: int, config, state) -> Dict:
         log_agent_info(self.name, "extracting structured sections from paper")
         agent = LangGraphAgent("expert paper section extractor", config, state, "parser")
-        
+        # 根据section_number的值去提配置文件里找对应的子标题列表
+        with open("config/prompts/section_number_config.json", 'r', encoding='utf-8') as f:
+            section_number_config = json.load(f)
+        section_subtitles = section_number_config["section_layout_subtitles"][str(section_number)]["section_type"]
+        input_subtitles = ''
+        for subtitle in section_subtitles:
+            input_subtitles += "    - " + subtitle + '\n'
+        print("input_subtitles:",input_subtitles)
+        template_data = {
+            "raw_text":raw_text,
+            "input_subtitles":input_subtitles
+        }
+
         for attempt in range(3):
             try:
-                prompt = Template(self.section_extraction_prompt).render(raw_text=raw_text)
+                prompt = Template(self.section_extraction_prompt).render(**template_data)
                 agent.reset()
                 #response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
