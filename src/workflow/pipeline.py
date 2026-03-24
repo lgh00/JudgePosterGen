@@ -25,6 +25,7 @@ from src.agents.color_agent import color_agent_node
 from src.agents.font_agent import font_agent_node
 from src.agents.new_renderer import renderer_node
 from utils.src.logging_utils import log_agent_info, log_agent_success, log_agent_error
+from src.config.poster_config import load_config
 
 env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(env_path, override=True)
@@ -177,8 +178,8 @@ def main():
     parser.add_argument("--vision_model", type=str, default="gpt-4o-2024-08-06",
                        choices=["gpt-4o-2024-08-06", "gpt-4.1-2025-04-14", "gpt-4.1-mini-2025-04-14", "claude-sonnet-4-20250514", "claude-opus-4.5", "gemini-2.5-pro", "glm-4.6v", "glm-4.5v", "glm-4v", "moonshot-v1-8k-vision-preview", "MiniMax-M2", "qwen3-vl-plus"],
                        help="Vision model for image analysis")
-    parser.add_argument("--poster_width", type=float, default=54, help="Poster width in inches")
-    parser.add_argument("--poster_height", type=float, default=36, help="Poster height in inches")
+    parser.add_argument("--poster_width", type=float, default=48, help="Poster width in inches")
+    parser.add_argument("--poster_height", type=float, default=27, help="Poster height in inches")
     parser.add_argument("--url", type=str, help="URL for QR code on poster") # TODO
     parser.add_argument("--logo", type=str, default="./data/Robustness_Reprogramming_for_Representation_Learning/logo.png", help="Path to conference/journal logo")
     parser.add_argument("--aff_logo", type=str, default="./data/Robustness_Reprogramming_for_Representation_Learning/aff.png", help="Path to affiliation logo")
@@ -192,8 +193,11 @@ def main():
         print(f"❌ Poster ratio is out of range: {input_ratio}. Please use a ratio between 1.0 and 2.")
         return 1
     
+    config = load_config()
     final_width = 52.0
     final_height = final_width / input_ratio
+    final_width += 2*config["layout"]["poster_margin"]
+    final_height += 2*config["layout"]["poster_margin"]
     
     # check .env file
     if env_path.exists():

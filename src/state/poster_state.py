@@ -87,6 +87,7 @@ class PosterState(TypedDict):
     vision_model: ModelConfig
 
     # processing results
+    section_number: Optional[int]
     images: Optional[Dict[str, Any]]
     tables: Optional[Dict[str, Any]]
     narrative: Optional[Dict[str, str]]

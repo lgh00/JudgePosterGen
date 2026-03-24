@@ -3,7 +3,7 @@
 layout:
   # dimensions (inches)
   poster_margin: 1.0
-  column_spacing: 1.0
+  subtitle_margin: 0.5
   title_height_fraction: 0.18     # fraction of ( title height / effective height)
   
   # spacing
@@ -15,11 +15,11 @@ layout:
   text_padding:
     left_right: 0.3
     top_bottom: 0.3
-  
-  # visual elements
-  visual_spacing:
-    below_visual: 0.3
-    side_padding: 0.3
+
+  visual:
+    margin: 0.3
+    spacing: 0.3
+    max_width: 10.0
 
 typography:
   fonts:

@@ -11,52 +11,29 @@
 - Available Images: {{ available_images }}
 - Available Tables: {{ available_tables }}
 
-**CRITICAL: Visual Asset Strategic Selection Process**
+**CRITICAL:** Visual Asset Strategic Selection Process**
 
 **Step 1 - Priority Ranking of Classified Visual Elements**
 - Rank the visual elements by their information contribution to the corresponding section, placing those that better represent the section higher in priority. For example, in the Research Methods section, position the complete experimental flow chart at the front and the detailed experimental flow chart at the back.
 - Provide the placement rationale for each visual element
 
 **Step 2 - Distribution of Visual Elements Based on Sections**
-**CRITICAL: Ensure a balanced distribution of visual elements across all sections
-
-**Title_Author:**
-- **Maximum:** 1 visual assets
-
-**Research_Background:**
-- **Maximum:** 1 visual assets
-
-**Research_Method:**
-- **MANDATORY:** Contains 1 visual assets
-- **Maximum:** 2 visual assets
-
-**Research_Results:**
-- **MANDATORY:** Contains 1 visual assets
-- **Maximum:** 2 visual assets
-
-**Conclusion_Outlook:**
-- **STRICT MAXIMUM:** 1 visual assets ONLY
-
-**When Too Many Visuals Exist:**
-- Remove the visual assets with lower priority, Convert less critical visuals to text summaries
-- **Example:** "Additional experiments showed 15% improvement (see paper Table 3)"
+- Ensure balanced distribution of visual elements among all sections, with the number of visual elements per section ranging from 0 to 2.
+- When Too Many Visuals Exist:
+Remove the visual assets with lower priority, Convert less critical visuals to text summaries
+**Example:** "Additional experiments showed 15% improvement (see paper Table 3)"
 
 **Step3 Validation of visual assets distribution**
 
 **CRITICAL VALIDATION RULES:**
-1.**Title_Author:**MUST have 0-1 visuals
-2.**Research_Background:**MUST have 0-1 visuals
-3.**Research_Method:**MUST have 1-2 visuals
-4.**Research_Results:**MUST have 1-2 visuals
-5.**Conclusion_Outlook:**MUST have EXACTLY 1 visuals
-6.**Total Visual Count:** Should be 3-6 visuals across entire poster
+**Total Visual Count:** Should be 3-8 visuals across entire poster
 
 **Content Organization Guidelines:**
 
 1. **Section Requirements:**
     - **Section titles**:Adopt the original section names of the respective sections
-    - **Text content**:Compose 2 to 3 complete pieces of information with varied and rich formatting levels based on the section content (see examples below)
-    - **Visual element integration**:Integrate the classified visual elements into the section information
+    - **Text content**:Based on the section content, generate 2–4 complete pieces of information using hierarchical and rich formatting styles (see examples below).For sections with visual assets, the textual content may be appropriately reduced;for sections without visual assets, explanatory content may be appropriately added.
+    - **Visual assets integration**:Integrate the classified visual assetss into the section information
     - **Complete content**: No ellipsis (...), write full bullet points
 
 2. **Rich Text Formatting Options (CRITICAL for Visual Hierarchy):**
@@ -123,15 +100,10 @@
 
 **Critical Success Criteria:**
 - **Full Space Utilization**:Each section must contain content
-- **Strategic placement**: Follow the sequence of Research Background, Research Method, Research Results, and Conclusion Outlook.
-- **Balanced Visual Distribution**:Strictly adhere to the visual element limits for each section:
-- Title_Author:**MUST** have 0-1 visuals
-- Research_Background:**MUST** have 0-1 visuals
-- Research_Method:**MUST** have 1-2 visuals
-- Research_Results:**MUST** have 1-2 visuals
-- Conclusion_Outlook:**MUST** have EXACTLY 1 visuals
+- **Strategic placement**: Follow the sequence of {{ section_subtitles }}.
+- **Balanced Visual Distribution**:Strictly adhere to the visual element limits for each section
 - **Text Content Quality**: Concise, well-structured and scannable text with a rich formatting hierarchy
-- **Text Density Control**: A maximum of 3 paragraphs of text and no more than 5 key pieces of information per section, with conciseness as the top priority
+- **Text Density Control**: A maximum of 4 paragraphs of text and no more than 5 key pieces of information per section, with priority given to conciseness and cognitive load management.
 - **Visual Element Selection Strategy**: Only the most critical visual elements are selected, and those with lower priority are converted into textual content
 
 Generate a spatial content plan and achieve the optimal design of poster content through strategic content combination that adheres to human-centered design principles and cognitive comprehension patterns.

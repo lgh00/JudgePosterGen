@@ -30,22 +30,20 @@ class Renderer:
         section_info = state["story_board"]#这里应该时story_board的数据
         section_info = self._preprocess_section_info(state, section_info)#预处理，将section_content改为提取内容
         # load poster layout data
-        resource_dir = Path(state["resource_dir"])
-        layout_dir = resource_dir / "poster_layouts"
-        layout_dir.mkdir(parents=True, exist_ok=True)
-        # 选取合适的poster_layout
-        poster_layouts_file = layout_dir / "poster_layouts.json"
         print("start_select_poster_layout")
-        poster_layout, sorted_area = self._select_poster_layout(state, section_info, poster_layouts_file)
-        self._save_poster_layout_info(state, poster_layout, sorted_area)
-
-        print("start_set_layout")
-        sections_layout = self._set_layout(state, section_info, poster_layout, sorted_area)
-        self._save_section_layout(state, sections_layout)
-
-        # render poster
-        print("start_render_poster")
-        self.render_poster(state, sections_layout)
+        with open(Path(state["resource_dir"]) / "poster_layouts/new_poster_layouts.json", 'r', encoding='utf-8') as f:
+            poster_layouts = json.load(f)
+            poster_layouts = poster_layouts[str(state["section_number"])]
+        # 选取合适的poster_layout
+        for poster_layout in poster_layouts:
+            print(f"start_set_layout{poster_layout['id']}")
+            sections_layout = self._set_layout(state, section_info, poster_layout["layout"])
+            sections_layout = self._add_poster_margin_info(sections_layout)
+            elements_layout = self._set_inner_layout(sections_layout)
+            # render poster
+            print("start_render_poster")
+            self.render_poster(state, poster_layout['id'], elements_layout)
+        self._打分()
 
         return state
     
@@ -175,43 +173,35 @@ class Renderer:
         total_area = text_area
         return total_area
 
-    def _set_layout(self, state: PosterState, section_info: Dict, poster_layout: Dict, sorted_area) -> Dict:
+    def _set_layout(self, state: PosterState, section_info: Dict, poster_layout: list) -> Dict:
+        ratio = 3.25 #海报英寸单位比虚拟16：9单位大3.25倍
         sections_layout = []
         sections = section_info["spatial_content_plan"]["sections"]
-        for id, info in enumerate(sorted_area):
-            section_title = info[0]
-            section_location = poster_layout["layout"][id]
-            for section in sections:
-                if(section["section_title"] == section_title):
-                    section_layout = {
-                        "section_title":section_title,
-                        "section_content":section["text_content"],
+        for section, section_location in zip(sections, poster_layout):
+            section_layout = {
+                "section_title": section["section_title"],
+                "section_content": section["text_content"],
+                "x": section_location[0]*ratio,
+                "y": section_location[1]*ratio,
+                "width": (section_location[2] - section_location[0])*ratio,
+                "height": (section_location[3] - section_location[1])*ratio
+            }
+            visuals_layout = []
+            for item in section["visual_assets"]:
+                visual_id = item["visual_id"]
+                visual_path, aspect = self._get_visual_path(visual_id, state)
+                if visual_path and Path(visual_path).exists():
+                    visual_layout = {
+                        "path":visual_path,
                         "x":section_location[0],
                         "y":section_location[1],
-                        "width":section_location[2] - section_location[0] + 1,
-                        "height":section_location[3] - section_location[1] + 1,
-                    }   
-
-                    '''获取视觉素材的布局信息'''
-                    visuals_layout = []
-                    for item in section["visual_assets"]:
-                        visual_id = item["visual_id"]
-                        visual_path, aspect = self._get_visual_path(visual_id, state)
-                        if visual_path and Path(visual_path).exists():
-                            visual_layout = {
-                                "path":visual_path,
-                                "x":section_location[0],
-                                "y":section_location[1],
-                                "width":3,
-                                "height":3/aspect,
-                                "aspect":aspect,
-                            }
-                            visuals_layout.append(visual_layout)
-
-                    section_layout["visuals_layout"] = visuals_layout
-
+                        "width":3,#后续需要一定的变化
+                        "height":3/aspect,
+                        "aspect":aspect,
+                    }
+                    visuals_layout.append(visual_layout)
+            section_layout["visuals_layout"] = visuals_layout
             sections_layout.append(section_layout)
-        """ 设置海报布局 """
         return sections_layout
 
     def _get_visual_path(self, visual_id: str, state: PosterState):
@@ -227,7 +217,130 @@ class Renderer:
         
         return None, None
 
-    def render_poster(self, state: PosterState, sections_layout: Dict):
+    def _add_poster_margin_info(self, sections_layout: list) -> list:
+        poster_margin = self.config["layout"]["poster_margin"]
+        for section_layout in sections_layout:
+            section_layout["x"] += poster_margin
+            section_layout["y"] += poster_margin
+        return sections_layout
+    
+    def _set_inner_layout(self, sections_layout: list) -> list:
+        elements_layout = []
+        for section_layout in sections_layout:
+            if section_layout["section_title"] == "title_author":
+                text_info = {
+                    "title_font_size": Pt(self.config["typography"]["sizes"]["title"]),
+                    "author_font_size": Pt(self.config["typography"]["sizes"]["authors"]),
+                    "title_font": self.config["typography"]["fonts"]["title"],
+                    "author_font": self.config["typography"]["fonts"]["authors"]
+                    # 颜色的事情暂时先不考虑
+                }
+                element_layout = {
+                    "element_type": "title_author",
+                    "content": section_layout["section_content"],
+                    "x": section_layout["x"],
+                    "y": section_layout["y"],
+                    "width": section_layout["width"],
+                    "height": section_layout["height"],
+                    **text_info
+                }
+                elements_layout.append(element_layout)
+            else:
+                x = section_layout["x"]
+                y = section_layout["y"]
+                width = section_layout["width"]
+                height = section_layout["height"]
+                # 处理子标题
+                subtitle_elements_layout = {
+                    "element_type": "subtitle",
+                    "content": section_layout["section_title"],
+                    "x": x + self.config["layout"]["subtitle_margin"],
+                    "y": y + self.config["layout"]["subtitle_margin"],
+                    "width": width - self.config["layout"]["subtitle_margin"] * 2,
+                    "height": self.config["typography"]["sizes"]["section_title"] / 72 + self.config["layout"]["subtitle_margin"],
+                    "font": self.config["typography"]["fonts"]["section_title"]
+                }
+                elements_layout.append(subtitle_elements_layout)
+                y += self.config["typography"]["sizes"]["section_title"] / 72 + self.config["layout"]["subtitle_margin"] * 2
+                height -= y
+
+                # 处理图片
+                visual_assets_num = len(section_layout["visuals_layout"])
+                visual_margin = self.config["layout"]["visual"]["margin"]
+                visual_spacing = self.config["layout"]["visual"]["spacing"]
+                visual_max_width = self.config["layout"]["visual"]["max_width"]
+                if visual_assets_num == 0:
+                    pass
+                elif visual_assets_num == 1:
+                    aspect = section_layout["visuals_layout"][0]["aspect"]
+                    if width / height > 1.8:
+                        visual_height = min(height - 2*visual_margin, visual_max_width / aspect)
+                        visual_element_layout = {
+                            "element_type": "visual",
+                            "path": section_layout["visuals_layout"][0]["path"],
+                            "x": x + visual_margin,
+                            "y": y + (height - visual_height) / 2 ,
+                            "width": visual_height * aspect,
+                            "height": visual_height
+                        }
+                        x += visual_height * aspect + visual_margin*2
+                        width -= x
+                        elements_layout.append(visual_element_layout)
+                    else:
+                        visual_width = min(width - 2*visual_margin, visual_max_width)
+                        visual_element_layout = {
+                            "element_type": "visual",
+                            "path": section_layout["visuals_layout"][0]["path"],
+                            "x": x + (width - visual_width) / 2 ,
+                            "y": y + visual_margin,
+                            "width": visual_width,
+                            "height": visual_width / aspect
+                        }
+                        y += visual_width / aspect + visual_margin*2
+                        height -= y
+                        elements_layout.append(visual_element_layout)
+                elif visual_assets_num == 2:
+                    visual_asset1 = section_layout["visuals_layout"][0]
+                    visual_path1 = visual_asset1["path"]
+                    visual_aspect1 = visual_asset1["aspect"]
+                    visual_asset2 = section_layout["visuals_layout"][1]
+                    visual_path2 = visual_asset2["path"]
+                    visual_aspect2 = visual_asset2["aspect"]
+                    max_text_space = 0
+                    best_strategy = None
+                    #两张图片靠左摆放上下叠放
+                    if (visual_max_width / visual_aspect1 + visual_max_width / visual_aspect2) * 0.7 + visual_spacing + visual_margin*2 <= height:
+                        reciprocal_aspect_sum = 1 / visual_aspect1 + 1 / visual_aspect2
+                        visual_width = min(height - 2*visual_margin - visual_spacing / reciprocal_aspect_sum, visual_max_width)
+                        text_space = (width - visual_width) * height
+                        if text_space > max_text_space:
+                            max_text_space = text_space
+                            best_strategy = "left1"
+                    # 两张图片靠左摆放左右摆放
+                    if (visual_max_width * 2 + visual_spacing + visual_margin*2) * 0.7 <= width:
+                        visual_width = min((height - 2*visual_margin) * min(visual_aspect1, visual_aspect2)*2, visual_max_width*2)
+                        text_space = (width - visual_width) * height
+                        if text_space > max_text_space:
+                            max_text_space = text_space
+                            best_strategy = "left2"
+                    # 两张照片靠上摆放左右摆放
+                    if (visual_max_width * 2 + visual_spacing + visual_margin*2) * 0.7 <= width:
+                        visual_height = min((width - 2*visual_margin - visual_spacing)/2, visual_max_width) / min(visual_aspect1, visual_aspect2)
+                        text_space = (height - visual_height) * width
+                        if text_space > max_text_space:
+                            max_text_space = text_space
+                            best_strategy = "top1"
+                    # 两张照片靠上摆放上下摆放
+                    if (visual_max_width / visual_aspect1 + visual_max_width / visual_aspect2) * 0.7 + visual_spacing + visual_margin*2 <= height:
+                        reciprocal_aspect_sum = 1 / visual_aspect1 + 1 / visual_aspect2
+                        visual_height = min(width - 2*visual_margin, visual_max_width) * reciprocal_aspect_sum
+                        text_space = (height - visual_height) * width
+                        if text_space > max_text_space:
+                            max_text_space = text_space
+                            best_strategy = "top2"
+
+
+    def render_poster(self, state: PosterState,poster_layout_id: int , sections_layout: Dict):
         """ 渲染海报 """
         prs = Presentation()
         prs.slide_width = Inches(state["poster_width"])
@@ -445,7 +558,7 @@ class Renderer:
                 content_para.font.bold = False
                 content_para.alignment = PP_ALIGN.LEFT
             
-        prs.save(Path(state["output_dir"]) / "poster.pptx")
+        prs.save(Path(state["output_dir"]) / f"poster_{poster_layout_id}.pptx")
         return state
 
 def renderer_node(state: PosterState) -> Dict[str, Any]:

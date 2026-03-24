@@ -1,7 +1,7 @@
 """
 spatial content planning and story board curation
 """
-
+import pdb
 import json
 from pathlib import Path
 from typing import Dict, Any, List
@@ -76,8 +76,15 @@ class StoryBoardCurator:
 
     def _create_story_board(self, structured_sections, narrative_content, classified_visuals, images, tables, visual_context, config, state):
         log_agent_info(self.name, "generating spatial content plan")
+        
         agent = LangGraphAgent("expert spatial poster designer", config, state, "curator")
         
+        with open("config/prompts/section_number_config.json", 'r', encoding="utf-8") as f:
+            section_number_config = json.load(f)
+        section_number = state.get("section_number", 0)
+        section_type = section_number_config["section_layout_subtitles"][str(section_number)]["section_type"]
+        section_subtitles = ", ".join(section_type)
+
         template_data = {
             "structured_sections": json.dumps(structured_sections, indent=2),
             "narrative_content": json.dumps(narrative_content, indent=2),
@@ -85,7 +92,8 @@ class StoryBoardCurator:
             "available_images": json.dumps({k: {"caption": v.get("caption", ""), "aspect": v.get("aspect", 1.0)} 
                                           for k, v in images.items()}, indent=2),
             "available_tables": json.dumps({k: {"caption": v.get("caption", ""), "aspect": v.get("aspect", 1.0)} 
-                                          for k, v in tables.items()}, indent=2)
+                                          for k, v in tables.items()}, indent=2),
+            "section_subtitles": section_subtitles
         }
         
         max_attempts = self.validation_config["max_llm_attempts"]
@@ -93,14 +101,14 @@ class StoryBoardCurator:
             try:
                 prompt = Template(self.spatial_planning_prompt).render(**template_data)
                 agent.reset()
-                response = agent.step(prompt)
+                #response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
-                with open(Path(state["output_dir"]) / "model_reply_create_story_board.txt", 'w', encoding='utf-8') as f:
-                    f.write(response.content)
-                    print("successfully write modle's reply of create_story_board")
+                with open(Path(state["output_dir"]) / "model_reply_create_story_board.txt", 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    print("successfully read modle's reply of create_story_board")
                     
-                story_board = extract_json(response.content)
-                #story_board = extract_json(content)
+                #story_board = extract_json(response.content)
+                story_board = extract_json(content)
                 
                 if self._validate_story_board(story_board, classified_visuals, visual_context):
                     log_agent_success(self.name, f"successfully created story board on attempt {attempt + 1}")

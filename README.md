@@ -178,7 +178,7 @@ uv run python -m src.workflow.pipeline \
 **For Conda setup:**
 ```bash
 python -m src.workflow.pipeline `
-  --poster_width 52 --poster_height 39 `
+  --poster_width 48 --poster_height 27 `
   --paper_path ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/paper.pdf `
   --text_model qwen3-max `
   --vision_model qwen3-vl-plus `

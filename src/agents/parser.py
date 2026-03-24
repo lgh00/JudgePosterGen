@@ -1,7 +1,7 @@
 """
 pdf text and asset extraction
 """
-
+import pdb
 import json
 from os import name
 import random
@@ -65,6 +65,8 @@ class Parser:
             # extract poster section number
             poster_section_number_content, inp_tok, out_tok = self._choose_poster_section_number(raw_text, state["text_model"], state)
             section_number = poster_section_number_content["poster_section_number"]
+            if type(section_number) == str:
+                section_number = int(section_number)
             state["tokens"].add_text(inp_tok, out_tok)
             
             narrative_content, inp_tok, out_tok = self._generate_narrative_content(raw_text, state["text_model"], state)
@@ -88,6 +90,7 @@ class Parser:
             self._save_raw_text(raw_text, content_dir)
             
             state["raw_text"] = raw_text
+            state["section_number"] = section_number
             state["structured_sections"] = structured_sections
             state["narrative_content"] = narrative_content
             state["classified_visuals"] = classified_visuals
@@ -98,7 +101,10 @@ class Parser:
             log_agent_success(self.name, f"extracted raw text, {len(figures)} images, and {len(tables)} tables")
             log_agent_success(self.name, f"extracted title: {title}")
             log_agent_success(self.name, "generated enhanced abt narrative")
-            log_agent_success(self.name, f"classified visuals: title and authors={classified_visuals.get('title_author', 'none')}, research background={len(classified_visuals.get('research_background', []))}, research method={len(classified_visuals.get('research_method', []))}, research result={len(classified_visuals.get('research_results', []))}, conclusion outlook={len(classified_visuals.get('conclusion_outlook', []))}")
+            with open("config/prompts/section_number_config.json", 'r', encoding="utf-8") as f:
+                section_number_config = json.load(f)
+            section_subtitles = section_number_config["section_layout_subtitles"][str(section_number)]["section_type"]
+            log_agent_success(self.name, "classified visuals: " + ", ".join([f"{subtitle}={len(classified_visuals.get(subtitle, []))}" for subtitle in section_subtitles]))
             
         except Exception as e:
             log_agent_error(self.name, f"failed: {e}")
@@ -516,4 +522,4 @@ class Parser:
 
 
 def parser_node(state: PosterState) -> PosterState:
-    return Parser()(state) 
+    return Parser()(state)

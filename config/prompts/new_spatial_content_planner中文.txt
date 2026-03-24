@@ -17,38 +17,20 @@
 - 为每一个视觉元素的摆放说明摆放依据
 
 步骤二 - 基于部分的视觉元素分布
-关键：确保各部分之间的视觉元素平衡分布
-
-
-改这里
-Research_Background：
-最大数量：1个视觉元素
-Research_Method：
-强制：包含1个视觉元素
-最大数量：2个视觉元素
-Research_Results:
-强制：包含1个视觉元素
-最大数量：2个视觉元素
-Conclusion_Outlook:
-严格数目要求：必须正好有1个视觉元素
-
-当某一部分视觉元素过多时：
+- 确保各部分之间的视觉元素平衡分布，确保每个板块的视觉元素数目在0-2之间
+- 当某一部分视觉元素过多时：
 删去优先级靠后的视觉元素，将视觉元素转换为文本摘要
 示例：“额外实验显示提高了 15%（见论文表 3）”
 
 步骤三 - 视觉元素分布验证
 关键验证规则：
-Research_Background：必须有0-1个视觉元素
-Research_Method：必须有1-2个视觉元素
-Research_Results：必须有1-2个视觉元素
-Conclusion_Outlook：必须正好有1个视觉元素
-整个海报布局的总数应为3-6个
+整个海报布局视觉元素的总数应为3-8个
 
 内容组织指南：
 
 板块要求：
 - 板块标题：使用板块原有的板块名
-- 文本内容：根据板块内容，使用不同的丰富层次格式（见以下示例）编写2-3条完整的信息
+- 文本内容：根据板块内容，使用不同的丰富层次格式（见以下示例）编写2-4条完整的信息，具有视觉元素信息的板块可适当减少文本内容，不具有视觉元素信息的板块可适当添加解释性内容。
 - 视觉元素整合：将被分类的视觉元素整合至板块信息中
 - 完整内容：不要使用省略号（……），写出完整的信息
 
@@ -92,7 +74,7 @@ Conclusion_Outlook：必须正好有1个视觉元素
 {
     "sections": [
       {
-        "section_title": "Research_Background",
+        "section_title": "research_background",
         "text_content": [
           "• **Key Innovation:** Core contribution with bold emphasis",
           "    ◦ Supporting technical detail",
@@ -112,14 +94,10 @@ Conclusion_Outlook：必须正好有1个视觉元素
 ```
 关键成功标准：
 - 每个板块必须都有内容
-- 战略性放置：遵循“Research_Background， Research_Method，Research_Results，Conclusion_Outlook”的模式
-- 视觉元素平衡分布：必须遵循板块视觉元素限制：
-Research_Background：必须有0-1个视觉元素
-Research_Method：必须有1-2个视觉元素
-Research_Results：必须有1-2个视觉元素
-Conclusion_Outlook：必须正好有1个视觉元素
+- 战略性放置：遵循{{ section_subtitles }}的模式
+- 视觉元素平衡分布：必须遵循板块视觉元素限制
 - 文本内容质量：简洁、层次分明、易于浏览的文本，具有丰富的格式
-- 文本密度控制：每个板块最多3段文本，不超过5个重点信息，优先考虑简洁性
+- 文本密度控制：每个板块最多4段文本，不超过5个重点信息，优先考虑简洁性
 - 视觉元素选择策略：只选择最关键的视觉元素，将优先级靠后的元素转换为文本
 
 生成一个空间内容计划，通过遵循人类设计模式和人类认知理解模式进行战略性内容组合，实现海报内容的完美设计。
