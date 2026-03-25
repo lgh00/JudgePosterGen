@@ -40,6 +40,7 @@ class ColorAgent:
             color_scheme = self._add_contrast_color(color_scheme)
             
             state["color_scheme"] = color_scheme
+            print("color_scheme:\n", color_scheme)
             state["current_agent"] = self.name
             
             self._save_color_scheme(state)
@@ -73,11 +74,14 @@ class ColorAgent:
                 {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_data}"}}
             ]
             
-            response = agent.step(json.dumps(messages))
-            result = extract_json(response.content)
-            
+            #response = agent.step(json.dumps(messages))
+            with open(Path(state["output_dir"]) / "model_reply_extract_theme_from_logo.txt", 'r', encoding='utf-8') as f:
+                content = f.read()
+                print("successfully read model reply of extracting theme from logo")
+            #result = extract_json(response.content)
+            result = extract_json(content)
             # add token usage
-            state["tokens"].add_vision(response.input_tokens, response.output_tokens)
+            #state["tokens"].add_vision(response.input_tokens, response.output_tokens)
             
             extracted_color = result.get("extracted_color", load_config()["colors"]["fallback_theme"])
             suitability_score = result.get("suitability_score", 0)

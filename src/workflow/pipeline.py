@@ -71,7 +71,8 @@ def create_workflow_graph() -> StateGraph:
 
     graph.add_edge(START, "parser")
     graph.add_edge("parser", "curator")
-    graph.add_edge("curator", "renderer")
+    graph.add_edge("curator", "color_agent")
+    graph.add_edge("color_agent", "renderer")
     '''
     graph.add_edge("curator", "color_agent")
     graph.add_edge("color_agent", "section_title_designer")
@@ -194,7 +195,7 @@ def main():
         return 1
     
     config = load_config()
-    final_width = 52.0
+    final_width = 48.0
     final_height = final_width / input_ratio
     final_width += 2*config["layout"]["poster_margin"]
     final_height += 2*config["layout"]["poster_margin"]

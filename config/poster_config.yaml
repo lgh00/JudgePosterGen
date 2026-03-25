@@ -3,7 +3,9 @@
 layout:
   # dimensions (inches)
   poster_margin: 1.0
+  section_margin: 0.3
   subtitle_margin: 0.5
+  text_margin: 0.8
   title_height_fraction: 0.18     # fraction of ( title height / effective height)
   
   # spacing
