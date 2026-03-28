@@ -49,6 +49,7 @@ class TimingMetrics:
     font_agent_time: float = 0.0
     title_designer_time: float = 0.0
     renderer_time: float = 0.0
+    score_agent_time: float = 0.0
     api_calls: List[APICall] = field(default_factory=list)
 
     def add_api_call(self, agent: str, call_type: str, input_tokens: int, output_tokens: int):
@@ -87,6 +88,7 @@ class PosterState(TypedDict):
     vision_model: ModelConfig
 
     # processing results
+    raw_text: Optional[str]
     section_number: Optional[int]
     images: Optional[Dict[str, Any]]
     tables: Optional[Dict[str, Any]]

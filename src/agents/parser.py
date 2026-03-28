@@ -122,6 +122,7 @@ class Parser:
         
         text, _, images = text_from_rendered(rendered)
         text = self.clean_pattern.sub("", text)
+        text = self._preprocess_paper_markdown(text)
         
         (content_dir / "raw.md").write_text(text, encoding="utf-8")
         
@@ -519,6 +520,56 @@ class Parser:
                     return False
         
         return True
+
+    def _preprocess_paper_markdown(self, text: str):
+        """
+        处理论文Markdown文本：删除References和Acknowledgements章节
+        :param text: 输入的原始Markdown文件路径
+        :return: 输出的处理后文本
+        """
+        # 定义需要删除的章节标题（小写，用于匹配）
+        DELETE_SECTIONS = {"references", "acknowledgements"}
+        # 跳过标记：True=当前行需要删除，False=保留
+        skip_mode = False
+        lines = text.split("\n")
+        processed_lines = []
+
+        for line in lines:
+            # 去除首尾空白字符（适配行首/行尾多余空格）
+            stripped_line = line.strip().lower()
+
+            # ============== 情况1：当前未开启跳过模式 ==============
+            if not skip_mode:
+                # 判断是否为 Markdown 二级标题（## 开头）
+                if stripped_line.startswith("### "):
+                    # 提取标题文本（去掉 ## 和空格）
+                    section_title = stripped_line[4:].strip()
+                    # 匹配到需要删除的章节
+                    if section_title in DELETE_SECTIONS:
+                        skip_mode = True  # 开启跳过模式
+                        continue  # 不保留当前标题行
+
+                # 未触发删除，直接保留该行
+                processed_lines.append(line)
+            # ============== 情况2：当前已开启跳过模式 ==============
+            else:
+                # 遇到下一个三级标题，先检查是否进入另一个跳过章节，如果是，不用管，如果不是，关闭跳过模式，保留该行
+                if stripped_line.startswith("### "):
+                    section_title = stripped_line[4:].strip()
+                    # 匹配到需要删除的章节
+                    if section_title in DELETE_SECTIONS:
+                        continue
+                    else:
+                        skip_mode = False
+                        processed_lines.append(line)
+                #进入别的章节，关闭跳过模式
+                elif stripped_line.startswith("##"):
+                    skip_mode = False
+                    processed_lines.append(line)
+                # 否则：跳过该行（不保留）
+                else:
+                    continue
+        return "\n".join(processed_lines)
 
 
 def parser_node(state: PosterState) -> PosterState:

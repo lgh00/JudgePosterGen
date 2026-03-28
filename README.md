@@ -177,6 +177,15 @@ uv run python -m src.workflow.pipeline \
 
 **For Conda setup:**
 ```bash
+python -m src.workflow.pipeline 
+  --poster_width 48 --poster_height 36 
+  --paper_path ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/paper.pdf 
+  --text_model qwen3-max 
+  --vision_model qwen3-vl-plus 
+  --logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/logo.png 
+  --aff_logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/aff.png
+```
+```powershell
 python -m src.workflow.pipeline `
   --poster_width 48 --poster_height 36 `
   --paper_path ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/paper.pdf `
@@ -185,7 +194,6 @@ python -m src.workflow.pipeline `
   --logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/logo.png `
   --aff_logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/aff.png
 ```
-
 **Parameters:**
 - `--poster_width/height`: Poster dimensions in inches, with aspect ratio (w/h): lower bound 1.4 (ISO A paper size), upper bound 2 (human vision limit)
 - `--paper_path`: Path to your PDF paper

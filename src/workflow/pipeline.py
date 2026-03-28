@@ -24,6 +24,7 @@ from src.agents.section_title_designer import section_title_designer_node
 from src.agents.color_agent import color_agent_node
 from src.agents.font_agent import font_agent_node
 from src.agents.new_renderer import renderer_node
+from src.agents.score_agent import score_agent_node
 from utils.src.logging_utils import log_agent_info, log_agent_success, log_agent_error
 from src.config.poster_config import load_config
 
@@ -53,6 +54,8 @@ def create_timing_wrapper(node_func: Callable, component_name: str) -> Callable:
             result["timing_metrics"].title_designer_time = elapsed
         elif component_name == "renderer":
             result["timing_metrics"].renderer_time = elapsed
+        elif component_name == "score_agent":
+            result["timing_metrics"].score_agent_time = elapsed
 
         return result
     return wrapper
@@ -68,11 +71,13 @@ def create_workflow_graph() -> StateGraph:
     graph.add_node("layout_optimizer", create_timing_wrapper(layout_optimizer_node, "layout_optimizer"))
     graph.add_node("font_agent", create_timing_wrapper(font_agent_node, "font_agent"))
     graph.add_node("renderer", create_timing_wrapper(renderer_node, "renderer"))
+    graph.add_node("score_agent", create_timing_wrapper(score_agent_node, "score_agent"))
 
     graph.add_edge(START, "parser")
     graph.add_edge("parser", "curator")
     graph.add_edge("curator", "color_agent")
     graph.add_edge("color_agent", "renderer")
+    graph.add_edge("renderer", "score_agent")
     '''
     graph.add_edge("curator", "color_agent")
     graph.add_edge("color_agent", "section_title_designer")
@@ -81,7 +86,7 @@ def create_workflow_graph() -> StateGraph:
     graph.add_edge("font_agent", "renderer")
     graph.add_edge("renderer", END)
     '''
-    graph.add_edge("renderer", END)
+    graph.add_edge("score_agent", END)
     return graph
 
 

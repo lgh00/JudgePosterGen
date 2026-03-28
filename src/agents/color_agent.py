@@ -40,7 +40,6 @@ class ColorAgent:
             color_scheme = self._add_contrast_color(color_scheme)
             
             state["color_scheme"] = color_scheme
-            print("color_scheme:\n", color_scheme)
             state["current_agent"] = self.name
             
             self._save_color_scheme(state)
@@ -77,7 +76,7 @@ class ColorAgent:
             #response = agent.step(json.dumps(messages))
             with open(Path(state["output_dir"]) / "model_reply_extract_theme_from_logo.txt", 'r', encoding='utf-8') as f:
                 content = f.read()
-                print("successfully read model reply of extracting theme from logo")
+                print("successfully read model's reply of extracting theme from logo")
             #result = extract_json(response.content)
             result = extract_json(content)
             # add token usage

@@ -32,7 +32,7 @@ Remove the visual assets with lower priority, Convert less critical visuals to t
 
 1. **Section Requirements:**
     - **Section titles**:Adopt the original section names of the respective sections
-    - **Text content**:Based on the section content, generate 2–4 complete pieces of information using hierarchical and rich formatting styles (see examples below).For sections with visual assets, the textual content may be appropriately reduced;for sections without visual assets, explanatory content may be appropriately added.
+    - **Text content**:Based on the section content, generate 2–4 complete pieces of information using hierarchical and rich formatting styles (see examples below).For sections with visual assets, limit information entries to 2–3 items;for sections without visual assets, explanatory content may be appropriately added.
     - **Visual assets integration**:Integrate the classified visual assetss into the section information
     - **Complete content**: No ellipsis (...), write full bullet points
 
@@ -103,7 +103,7 @@ Remove the visual assets with lower priority, Convert less critical visuals to t
 - **Strategic placement**: Follow the sequence of {{ section_subtitles }}.
 - **Balanced Visual Distribution**:Strictly adhere to the visual element limits for each section
 - **Text Content Quality**: Concise, well-structured and scannable text with a rich formatting hierarchy
-- **Text Density Control**: A maximum of 4 paragraphs of text and no more than 5 key pieces of information per section, with priority given to conciseness and cognitive load management.
+- **Text Density Control**: A maximum of 4 text paragraphs per section; sections with visual elements limited to 3 paragraphs at most. No more than 5 key pieces of information per section, with priority given to conciseness and cognitive load management.
 - **Visual Element Selection Strategy**: Only the most critical visual elements are selected, and those with lower priority are converted into textual content
 
 Generate a spatial content plan and achieve the optimal design of poster content through strategic content combination that adheres to human-centered design principles and cognitive comprehension patterns.

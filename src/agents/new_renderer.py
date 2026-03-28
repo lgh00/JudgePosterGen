@@ -46,9 +46,8 @@ class Renderer:
             self._save_elements_info(state, poster_layout['id'],elements_layout)
             # render poster
             print("start_render_poster")
-            self.render_poster(state, poster_layout['id'], elements_layout)
-        self._打分()
-
+            output_path = self.render_poster(state, poster_layout['id'], elements_layout)
+            self._convert_to_png(output_path)
         return state
     
     def _save_elements_info(self, state: PosterState, poster_layout_id: int, elements_layout: list):
@@ -455,7 +454,7 @@ class Renderer:
                     content_para.alignment = PP_ALIGN.LEFT
         prs.save(Path(state["output_dir"]) / f"poster_{poster_layout_id}.pptx")
         print(f"save poster{poster_layout_id}")
-        return 0
+        return Path(state["output_dir"]) / f"poster_{poster_layout_id}.pptx"
     
     def _add_formatted_runs(self, paragraph, text: str, font_family: str, 
                           base_font_size, base_color):
@@ -583,6 +582,71 @@ class Renderer:
         hex_color = color_str.lstrip('#')
         r, g, b = (int(hex_color[i:i+2], 16) for i in (0, 2, 4))
         return RGBColor(r, g, b)
+
+    def _convert_to_png(self, pptx_path: Path) -> Optional[str]:
+        """convert PPTX to PNG using LibreOffice"""
+        try:
+            import subprocess
+            output_dir = pptx_path.parent
+            
+            import platform
+            system = platform.system().lower()
+            
+            if system == "windows":
+                libreoffice_paths = [
+                    r"C:\\Program Files\\LibreOffice\\program\\soffice.exe",
+                    r"C:\\Program Files\\LibreOffice\\program\\soffice.exe",
+                    r"C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe",
+                    r"C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\LibreOffice\\program\\soffice.exe",
+                    "soffice.exe",
+                    "libreoffice.exe"
+                ]
+            elif system == "linux":
+                libreoffice_paths = [
+                    "/usr/bin/libreoffice",
+                    "/usr/local/bin/libreoffice",
+                    "/snap/bin/libreoffice",
+                    "/usr/bin/soffice",
+                    "libreoffice",
+                    "soffice"
+                ]
+            elif system == "darwin":  # macOS
+                libreoffice_paths = [
+                    "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+                    "/usr/local/bin/libreoffice",
+                    "libreoffice",
+                    "soffice"
+                ]
+            else:
+                libreoffice_paths = [
+                    "libreoffice",
+                    "soffice"
+                ]
+            
+            for lo_path in libreoffice_paths:
+                try:
+                    cmd = [
+                        lo_path, "--headless", "--convert-to", "png",
+                        "--outdir", str(output_dir), str(pptx_path)
+                    ]
+                    
+                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+                    if result.returncode == 0:
+                        png_name = pptx_path.stem + ".png"
+                        png_path = output_dir / png_name
+                        if png_path.exists():
+                            return str(png_path)
+                            
+                except (subprocess.SubprocessError, FileNotFoundError):
+                    continue
+            
+            log_agent_error(self.name, "LibreOffice not found - install for PNG conversion")
+            
+        except Exception as e:
+            log_agent_error(self.name, f"PNG conversion failed: {e}")
+            
+        return None
+
 
 def renderer_node(state: PosterState) -> Dict[str, Any]:
     print("start_render_node")

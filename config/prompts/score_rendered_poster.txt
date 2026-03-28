@@ -1,0 +1,25 @@
+**Task:** In strict accordance with the following requirements, conduct multi-dimensional scoring on the input academic poster based on the original poster text.
+Input: {{ raw_text }}
+
+**Requirements:**
+
+1. Scoring Range: Discrete scoring shall be adopted for all dimensions, and the score can only be selected from 0, 1, 2, 3, 4, 5.
+2. Evaluation Dimensions: There are 6 core dimensions in total. The definition, judgment criteria and scoring reference of each dimension are as follows. Scores shall be given strictly in accordance with the standards, without omission or deviation.
+3. Output Requirements: Only the specified JSON format shall be returned, without adding any additional explanations, notes or supplementary text. The JSON format shall strictly match the example, the key names shall not be modified or omitted, and the scores shall correspond to the correct dimensions.
+
+**Evaluation Dimensions and Scoring Standards:**
+
+{{ score_standard }}
+输出格式：
+```json
+{
+    "Authorship and Title Accuracy": 0-5,
+    "Image Uniqueness and Quality": 0-5,
+    ......
+}
+```
+**Notes:**
+- Only integers from 0, 1, 2, 3, 4, 5 shall be filled in for scoring; no other values or symbols shall appear.
+- The JSON format shall be complete, the key names shall be consistent with those mentioned above, and no keys shall be added, deleted or modified, nor shall there be any grammatical errors.
+- No additional text (including explanations, notes, comments, etc.) shall be added; only the above-mentioned JSON content shall be returned.
+- Scores for each dimension shall be given strictly in accordance with the definition and scoring reference of the corresponding dimension, without subjective assumptions or deviation from the standards.
