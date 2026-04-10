@@ -92,6 +92,7 @@ class PosterState(TypedDict):
     section_number: Optional[int]
     images: Optional[Dict[str, Any]]
     tables: Optional[Dict[str, Any]]
+    expected_preset_layout: Optional[Dict[str, Any]]
     narrative: Optional[Dict[str, str]]
     poster_plan: Optional[List[Dict[str, Any]]]
     poster_width: int

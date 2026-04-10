@@ -159,6 +159,10 @@ def save_timing_log(state: PosterState):
             "renderer": {
                 "time_seconds": round(metrics.renderer_time, 2),
                 "percentage": metrics.get_component_percentage(metrics.renderer_time)
+            },
+            "score_agent": {
+                "time_seconds": round(metrics.score_agent_time, 2),
+                "percentage": metrics.get_component_percentage(metrics.score_agent_time)
             }
         },
         "api_calls_by_agent": api_calls_by_agent,
@@ -241,7 +245,7 @@ def main():
     print(f"📄 PDF: {pdf_path}")
     print(f"🤖 Models: {args.text_model}/{args.vision_model}")
     print(f"📏 Size: {final_width}\" × {final_height:.2f}\"")
-    print(f"🏢 Conference Logo: {args.logo}")
+    #print(f"🏢 Conference Logo: {args.logo}")
     print(f"🏫 Affiliation Logo: {args.aff_logo}")
     
     try:
@@ -265,12 +269,13 @@ def main():
         if final_state.get("errors"):
             log_agent_error("pipeline", f"Pipeline errors: {final_state['errors']}")
             return 1
+        '''
         required_outputs = ["story_board", "design_layout", "color_scheme", "styled_layout"]
         missing = [out for out in required_outputs if not final_state.get(out)]
         if missing:
             log_agent_error("pipeline", f"Missing outputs: {missing}")
             return 1
-        
+        '''
         log_agent_success("pipeline", "Pipeline completed successfully")
 
         # full pipeline summary

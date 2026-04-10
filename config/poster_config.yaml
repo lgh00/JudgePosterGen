@@ -17,11 +17,15 @@ layout:
   text_padding:
     left_right: 0.3
     top_bottom: 0.3
+  #border
+  border:
+    title: 0.5
 
   visual:
     margin: 0.3
     spacing: 0.3
     max_width: 10.0
+  aff_logo_height: 1.0 #inches固定的从属机构标志
 
 typography:
   fonts:
@@ -213,6 +217,8 @@ indentation:
   secondary_bullet_char: "\u25e6" # ◦
   secondary_level: 1
   primary_level: 0
+  primary_first_line_indent: 1.0
+  secondary_indent: 2.0
 
 # llm
 llm:

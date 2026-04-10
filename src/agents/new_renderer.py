@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 import json
 import numpy as np
+from PIL import Image
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
@@ -42,11 +43,11 @@ class Renderer:
             sections_layout = self._set_layout(state, section_info, poster_layout["layout"])
             sections_layout = self._add_poster_margin_info(sections_layout)
             color_scheme = state["color_scheme"]
-            elements_layout = self._set_elements_layout(sections_layout, color_scheme)
+            elements_layout = self._set_elements_layout(state, sections_layout, color_scheme)
             self._save_elements_info(state, poster_layout['id'],elements_layout)
             # render poster
             print("start_render_poster")
-            output_path = self.render_poster(state, poster_layout['id'], elements_layout)
+            output_path = self._render_poster(state, poster_layout['id'], elements_layout)
             self._convert_to_png(output_path)
         return state
     
@@ -116,7 +117,7 @@ class Renderer:
             section_layout["y"] += poster_margin
         return sections_layout
     
-    def _set_elements_layout(self, sections_layout: list, color_scheme: Dict) -> list:
+    def _set_elements_layout(self, state: PosterState, sections_layout: list, color_scheme: Dict) -> list:
         elements_layout = []
         for section_layout in sections_layout:
             if section_layout["section_title"] == "title_author":
@@ -135,11 +136,29 @@ class Renderer:
                     "y": section_layout["y"],
                     "width": section_layout["width"],
                     "height": section_layout["height"],
-                    "border_width": 0.5,
+                    "border_width": self.config["layout"]["border"]["title"],
                     "border_color": self._parse_color(color_scheme["theme"]),
                     **text_info
                 }
                 elements_layout.append(element_layout)
+                aff_logo_path = state.get("aff_logo_path")
+                if aff_logo_path and Path(aff_logo_path).exists():
+                    aff_logo = Image.open(aff_logo_path)
+                    aff_logo_width, aff_logo_height = aff_logo.size
+                    aff_logo_aspect = aff_logo_width / aff_logo_height
+                    aff_logo_height = self.config["layout"]["aff_logo_height"]
+                    aff_logo_width = aff_logo_height * aff_logo_aspect
+                    element_layout = {
+                        "element_type": "aff_logo",
+                        "path": aff_logo_path,
+                        "x": section_layout["x"] + (section_layout["width"] - aff_logo_width) - self.config["layout"]["border"]["title"],
+                        "y": section_layout["y"] + (section_layout["height"] - aff_logo_height) - self.config["layout"]["border"]["title"],
+                        "width": aff_logo_width,
+                        "height": aff_logo_height
+                    }
+                    elements_layout.append(element_layout)
+                else:
+                    log_agent_error(self.name, f"aff_logo_path {aff_logo_path} not exists")
             else:
                 x = section_layout["x"]
                 y = section_layout["y"]
@@ -359,7 +378,7 @@ class Renderer:
                 elements_layout.append(text_element_layout)
         return elements_layout
 
-    def render_poster(self, state: PosterState,poster_layout_id: int , elements_layout: list):
+    def _render_poster(self, state: PosterState,poster_layout_id: int , elements_layout: list):
         """ 渲染海报 """
         prs = Presentation()
         prs.slide_width = Inches(state["poster_width"])
@@ -427,6 +446,14 @@ class Renderer:
                     Inches(element_layout["width"]),
                     Inches(element_layout["height"])
                 )
+            elif element_layout["element_type"] == "aff_logo":
+                image = slide.shapes.add_picture(
+                    element_layout["path"],
+                    Inches(element_layout["x"]),
+                    Inches(element_layout["y"]),
+                    Inches(element_layout["width"]),
+                    Inches(element_layout["height"])
+                )
             elif element_layout["element_type"] == "text":
                 textbox = slide.shapes.add_textbox(
                     Inches(element_layout["x"]),
@@ -448,6 +475,8 @@ class Renderer:
                     line = line.strip()
                     if line.strip().startswith(self.indentation_config["secondary_bullet_char"]):
                         content_para.level = self.indentation_config["secondary_level"]
+                        content_para.bullet = None
+                        self._set_indent(content_para, marL=720000)       
                     else:
                         content_para.level = self.indentation_config["primary_level"]
                     self._add_formatted_runs(content_para, line, element_layout["font"], Pt(element_layout["font_size"]), RGBColor(0, 0, 0))
@@ -582,6 +611,18 @@ class Renderer:
         hex_color = color_str.lstrip('#')
         r, g, b = (int(hex_color[i:i+2], 16) for i in (0, 2, 4))
         return RGBColor(r, g, b)
+    
+    def _set_indent(self, paragraph, marL=0, firstLineInd=0):
+        pPr = paragraph._p.get_or_add_pPr()
+        
+        # 清除旧节点
+        for child in pPr[:]:
+            if "parLvl" in child.tag:
+                pPr.remove(child)
+        
+        # 正确属性名！
+        pPr.set("marL", str(marL))          # 整段左缩进
+        pPr.set("firstLineInd", str(firstLineInd))  # 首行缩进 ✅
 
     def _convert_to_png(self, pptx_path: Path) -> Optional[str]:
         """convert PPTX to PNG using LibreOffice"""

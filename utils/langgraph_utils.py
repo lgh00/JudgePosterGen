@@ -7,7 +7,7 @@ import json
 import json_repair
 
 from langchain_openai import ChatOpenAI
-from langchain_anthropic import ChatAnthropic  
+from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_community.callbacks.manager import get_openai_callback

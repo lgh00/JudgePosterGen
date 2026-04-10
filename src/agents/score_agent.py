@@ -24,29 +24,26 @@ class ScoreAgent:
             with open(Path(state["resource_dir"]) / "poster_layouts/new_poster_layouts.json", 'r', encoding='utf-8') as f:
                 poster_layouts = json.load(f)
                 poster_layouts = poster_layouts[str(state["section_number"])]
-            poster_score = {}
-            for poster_layout in poster_layouts:
-                poster_path = Path(state["output_dir"]) / f"poster_{poster_layout['id']}.png"
-                result = self._score_poster(poster_path, state)
-                poster_score[str(poster_layout['id'])] = {"special_score": result}
-                final_score = 0
-                for score in result.values():
-                    final_score += score
-                poster_score[str(poster_layout['id'])]["final_score"] = final_score / len(result)
-            log_agent_info(self.name, "starting selecting best poster")
-            max_score = 0
-            max_score_id = ""
-            for poster_id, score in poster_score.items():
-                if max_score < score["final_score"]:
-                    max_score = score["final_score"]
-                    max_score_id = poster_id
-            os.rename(Path(state["output_dir"]) / f"poster_{max_score_id}.png", Path(state["output_dir"]) / "best_poster.png")
-            self._save_score(state, poster_score[max_score_id])
-            log_agent_success(self.name, f"successfully select best poster poster_{max_score_id}")
+            # score posters
+            posters_score = self._score_posters(state, poster_layouts)
+            # select best poster
+            self._select_best_poster(state, posters_score)
         except Exception as e:
             log_agent_error(self.name, f"failed: {e}")
             state["errors"].append(f"{self.name}: {e}")
         return state
+
+    def _score_posters(self, state: PosterState, poster_layouts: Dict):
+        posters_score = {}
+        for poster_layout in poster_layouts:
+            poster_path = Path(state["output_dir"]) / f"poster_{poster_layout['id']}.png"
+            result = self._score_poster(poster_path, state)
+            posters_score[str(poster_layout['id'])] = {"special_score": result}
+            final_score = 0
+            for score in result.values():
+                final_score += score
+            posters_score[str(poster_layout['id'])]["final_score"] = final_score / len(result)
+        return posters_score
 
     def _score_poster(self, poster_path: Path, state: PosterState):
         log_agent_info(self.name, f"scoring poster {Path(poster_path).name}")
@@ -67,13 +64,15 @@ class ScoreAgent:
                 raw_text = state["raw_text"]
                 template_data = {
                     "raw_text": raw_text,
+                    "expected_preset_layout": json.dumps(state["expected_preset_layout"], indent=2),
                     "score_standard": json.dumps(score_standard, indent=2)
                 }
                 score_prompt = Template(self.score_prompt).render(**template_data)
                 ###检验
                 messages = [
-                        {"type": "text", "text": score_prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_data}"}}
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_data}"}},
+                    {"type": "text", "text": score_prompt}
+                        
                 ]
                 
                 response = agent.step(json.dumps(messages))
@@ -92,6 +91,21 @@ class ScoreAgent:
                 if attempt == max_attempts - 1:
                     raise ValueError("failed to score poster after multiple attempts")
         raise ValueError("failed to score poster")
+    
+    def _select_best_poster(self, state: PosterState, poster_score: Dict):
+        log_agent_info(self.name, "starting selecting best poster")
+        max_score = 0
+        max_score_id = ""
+        for poster_id, score in poster_score.items():
+            if max_score < score["final_score"]:
+                max_score = score["final_score"]
+                max_score_id = poster_id
+        if os.path.isfile(Path(state["output_dir"]) / "best_poster.png"):
+            os.remove(Path(state["output_dir"]) / "best_poster.png")
+            log_agent_info(self.name, "the past best_poster.png has been deleted")
+        os.rename(Path(state["output_dir"]) / f"poster_{max_score_id}.png", Path(state["output_dir"]) / "best_poster.png")
+        self._save_score(state, poster_score[max_score_id])
+        log_agent_success(self.name, f"successfully select best poster poster_{max_score_id}")
 
     def _validate_score(self, result: Dict, score_standard: Dict) -> bool:
         """validate score result"""
@@ -105,6 +119,6 @@ class ScoreAgent:
         with open(Path(state["output_dir"]) / f"content/best_poster_score.json", "w", encoding='utf-8') as f:
             json.dump(poster_score, f, indent=2)
         log_agent_success(self.name, f"successfully save best poster score")
+
 def score_agent_node(state: PosterState) -> PosterState:
     return ScoreAgent()(state)
-

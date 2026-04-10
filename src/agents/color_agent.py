@@ -73,14 +73,14 @@ class ColorAgent:
                 {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_data}"}}
             ]
             
-            #response = agent.step(json.dumps(messages))
-            with open(Path(state["output_dir"]) / "model_reply_extract_theme_from_logo.txt", 'r', encoding='utf-8') as f:
-                content = f.read()
-                print("successfully read model's reply of extracting theme from logo")
-            #result = extract_json(response.content)
-            result = extract_json(content)
+            response = agent.step(json.dumps(messages))
+            with open(Path(state["output_dir"]) / "model_reply_extract_theme_from_logo.txt", 'w', encoding='utf-8') as f:
+                f.write(response.content)
+                print("successfully write model's reply of extracting theme from logo")
+            result = extract_json(response.content)
+            #result = extract_json(content)
             # add token usage
-            #state["tokens"].add_vision(response.input_tokens, response.output_tokens)
+            state["tokens"].add_vision(response.input_tokens, response.output_tokens)
             
             extracted_color = result.get("extracted_color", load_config()["colors"]["fallback_theme"])
             suitability_score = result.get("suitability_score", 0)

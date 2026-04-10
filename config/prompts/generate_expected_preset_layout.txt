@@ -1,0 +1,27 @@
+**Task:**
+Formulate poster layout requirements from the perspective of cognitive utility, based on the section content and graphic information extracted from the original paper.
+
+**Input:**
+- Structured Sections of the Paper: {{ structured_sections }}
+- Available Images: {{ available_images }}
+- Available Tables: {{ available_tables }}
+
+Generate an independent cognition-oriented minimal preset layout expectation statement. This statement serves as lightweight auxiliary guidance exclusively for the subsequent poster scoring agent. The overall expectation shall be designed around cognitive utility, reader comprehension efficiency, and cognitive load reduction. Do not list all extracted sections, and do not provide precise coordinates or detailed proportion values. Only output concrete, concise, and actionable requirements in short sentences, strictly following the specified format below:
+1. Core figures and tables that must be included;
+2. Key concepts that must be explained;
+3. Prescribed visual focus position.
+
+The content must cover the following points:
+- Specify the overall recommended visual flow based on standard human reading cognition (only indicate top-to-bottom / left-to-right);
+- Propose 2–4 concrete rules: define key experimental figures from the original manuscript as mandatory visual elements that must be fully presented in the final poster;
+- Clarify mandatory content requirements: identify which professional concepts and core research key points must be retained and formally explained on the poster;
+- Provide macro visual guidance: specify the preferred visual focus area of the poster (e.g., top center / central main area / key sidebar), and state the basic principles for image–text matching and minimal white-space arrangement.
+
+**Output Format:**
+```json
+{
+    "expected_preset_layout":[
+        "..."
+    ]
+}
+```

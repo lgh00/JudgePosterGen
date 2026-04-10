@@ -74,5 +74,9 @@
   "Immediacy of Cognitive Feedback": {
     "Definition": "Determine whether the poster allows readers to immediately judge whether they understand the core information during the reading process through summary sentences, core viewpoint labels, key conclusion extraction, etc., avoiding the vague state of 'reading but having no cognitive gain'.",
     "Scoring Reference": "5 points: Fully compliant, there are clear summary sentences and core viewpoint labels, readers can immediately judge their own understanding, and have clear cognitive gains after reading; 3-4 points: Basically compliant, there is certain summary content, readers can roughly judge their own understanding, and have basic cognitive gains after reading; 1-2 points: Non-compliant, lack of summary content, readers find it difficult to judge their own understanding, and the cognitive gain after reading is vague; 0 points: Completely non-compliant, there is no summary content at all, readers cannot judge their own understanding, and have no cognitive gain after reading."
+  },
+  "Cognition-Oriented Layout Conformity": {
+    "Definition":"From the perspective of cognitive utility, evaluate whether the overall arrangement, core section zoning and partitioning logic match the cognition-oriented preset layout generated from the original paper; meanwhile verify whether all mandatory essential figures specified in the paper are fully included.",
+    "Scoring Reference":"5 points: Overall arrangement, cognitive flow and core zoning fully comply with expectations; 3-4 points: Macro layout follows cognitive expectations with minor adjustments; all essential figures are retained; 1-2 points: Arrangement deviates from cognitive flow, core sections are misplaced, and some mandatory figures are missing; 0 points: Completely inconsistent with cognitive layout logic; most key essential figures are absent."
   }
 }

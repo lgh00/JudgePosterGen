@@ -25,6 +25,7 @@ from src.config.poster_config import load_config
 class Parser:
     def __init__(self):
         self.name = "parser"
+        self.validation_config = load_config()["validation"]
         config_data = load_config()
         batch_config = config_data["pdf_processing"]["batch_sizes"]
         config = {
@@ -44,6 +45,7 @@ class Parser:
         self.title_authors_prompt = load_prompt("config/prompts/extract_title_authors.txt")
         self.poster_section_number_prompt = load_prompt("config/prompts/choose_poster_section_number.txt")#新加入
         self.section_extraction_prompt = load_prompt("config/prompts/new_extract_structured_sections.txt")#修改了
+        self.generate_expected_preset_layout_prompt = load_prompt("config/prompts/generate_expected_preset_layout.txt")#新加入
     
     def __call__(self, state: PosterState) -> PosterState:
         log_agent_info(self.name, "starting foundation building")
@@ -81,12 +83,13 @@ class Parser:
             }
 
             structured_sections = self._extract_structured_sections(raw_text, section_number, state["text_model"], state)
-            
+            expected_preset_layout = self._generate_expected_preset_layout(structured_sections, state["text_model"], figures, tables, state)
             # save artifacts and update state
             self._save_content(poster_section_number_content, "poster_section_number.json", content_dir)
             self._save_content(narrative_content, "narrative_content.json", content_dir)
             self._save_content(classified_visuals, "classified_visuals.json", content_dir)
             self._save_content(structured_sections, "structured_sections.json", content_dir)
+            self._save_content(expected_preset_layout, "expected_preset_layout.json", content_dir)
             self._save_raw_text(raw_text, content_dir)
             
             state["raw_text"] = raw_text
@@ -96,6 +99,7 @@ class Parser:
             state["classified_visuals"] = classified_visuals
             state["images"] = figures
             state["tables"] = tables
+            state["expected_preset_layout"] = expected_preset_layout
             state["current_agent"] = self.name
             
             log_agent_success(self.name, f"extracted raw text, {len(figures)} images, and {len(tables)} tables")
@@ -148,15 +152,14 @@ class Parser:
                 prompt = Template(self.poster_section_number_prompt).render(**template_data)
                 agent.reset()
 
-                #response = agent.step(prompt)
-                with open(Path(state["output_dir"]) / "model_reply_choose_poster_section_number.txt", 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    print("successfully read modle's reply of choose_poster_section_number")
-                #content = extract_json(response.content)
-                poster_section_number_content = extract_json(content)
+                response = agent.step(prompt)
+                with open(Path(state["output_dir"]) / "model_reply_choose_poster_section_number.txt", 'w', encoding='utf-8') as f:
+                    f.write(response.content)
+                    print("successfully write model's reply of choose_poster_section_number")
+                poster_section_number_content = extract_json(response.content)
+                #poster_section_number_content = extract_json(content)
                 if "poster_section_number" in poster_section_number_content and "reason" in poster_section_number_content:
-                    #return poster_section_number_content, response.input_tokens, response.output_tokens
-                    return poster_section_number_content, 0, 0
+                    return poster_section_number_content, response.input_tokens, response.output_tokens
 
             except Exception as e:
                 log_agent_warning(self.name, f"attempt {attempt + 1} failed: {e}")
@@ -172,18 +175,17 @@ class Parser:
             try:
                 prompt = Template(self.enhanced_abt_prompt).render(markdown_document=text)
                 agent.reset()
-                #response = agent.step(prompt)
+                response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
-                with open(Path(state["output_dir"]) / "model_reply_generate_narrative_content.txt", 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    print("successfully read modle's reply of generate_narrative_content")
+                with open(Path(state["output_dir"]) / "model_reply_generate_narrative_content.txt", 'w', encoding='utf-8') as f:
+                    f.write(response.content)
+                    print("successfully write model's reply of generate_narrative_content")
                     
-                #narrative = extract_json(response.content)
-                narrative = extract_json(content)
+                narrative = extract_json(response.content)
+                #narrative = extract_json(content)
 
                 if "and" in narrative and "but" in narrative and "therefore" in narrative:
-                    #return narrative, response.input_tokens, response.output_tokens
-                    return narrative, 0, 0
+                    return narrative, response.input_tokens, response.output_tokens
 
             except Exception as e:
                 log_agent_warning(self.name, f"attempt {attempt + 1} failed: {e}")
@@ -331,13 +333,13 @@ class Parser:
             try:
                 prompt = Template(self.title_authors_prompt).render(markdown_document=text)
                 agent.reset()
-                #response = agent.step(prompt)
+                response = agent.step(prompt)
                 ###
-                with open(Path(state["output_dir"]) / "model_reply_extract_title_authors.txt", 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    print("successfully read modle's reply of extract_title_authors")
-                #result = extract_json(response.content)
-                result = extract_json(content)
+                with open(Path(state["output_dir"]) / "model_reply_extract_title_authors.txt", 'w', encoding='utf-8') as f:
+                    f.write(response.content)
+                    print("successfully write model's reply of extract_title_authors")
+                result = extract_json(response.content)
+                #result = extract_json(content)
 
 
                 if "title" in result and "authors" in result:
@@ -412,13 +414,13 @@ class Parser:
                 prompt = Template(self.visual_classification_prompt).render(**template_data)
                 agent.reset()
 
-                #response = agent.step(prompt)
+                response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
-                with open(Path(state["output_dir"]) / "model_reply_classify_visual_assets.txt", 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    print("successfully read modle's reply of classify_visual_assets")
-                #classification = extract_json(response.content)
-                classification = extract_json(content)
+                with open(Path(state["output_dir"]) / "model_reply_classify_visual_assets.txt", 'w', encoding='utf-8') as f:
+                    f.write(response.content)
+                    print("successfully write model's reply of classify_visual_assets") 
+                classification = extract_json(response.content)
+                #classification = extract_json(content)
                 
                 # validate classification
                 required_keys = section_layout_config["section_type"]
@@ -467,7 +469,6 @@ class Parser:
         input_subtitles = ''
         for subtitle in section_subtitles:
             input_subtitles += "    - " + subtitle + '\n'
-        print("input_subtitles:",input_subtitles)
         template_data = {
             "raw_text":raw_text,
             "input_subtitles":input_subtitles
@@ -477,13 +478,13 @@ class Parser:
             try:
                 prompt = Template(self.section_extraction_prompt).render(**template_data)
                 agent.reset()
-                #response = agent.step(prompt)
+                response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
-                with open(Path(state["output_dir"]) / "model_reply_extract_structured_sections.txt", 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    print("successfully read modle's reply of extract_structured_sections")
-                #structured_sections = extract_json(response.content)
-                structured_sections = extract_json(content)
+                with open(Path(state["output_dir"]) / "model_reply_extract_structured_sections.txt", 'w', encoding='utf-8') as f:
+                    f.write(response.content)
+                    print("successfully write model's reply of extract_structured_sections")
+                structured_sections = extract_json(response.content)
+                #structured_sections = extract_json(content)
                 if self._validate_structured_sections(structured_sections):
                     log_agent_success(self.name, f"extracted {len(structured_sections.get('paper_sections', []))} structured sections")
                     return structured_sections
@@ -500,6 +501,36 @@ class Parser:
             "paper_sections": [],
         }
     
+    def _generate_expected_preset_layout(self, structured_sections: Dict, config, images: Dict, tables: Dict, state) -> Dict:
+        log_agent_info(self.name, "generate expected preset layout")
+        agent = LangGraphAgent("expert poster designer", config, state, "parser")
+
+        template_data = {
+            "structured_sections": structured_sections,
+            "available_images": json.dumps({k: {"caption": v.get("caption", ""), "aspect": v.get("aspect", 1.0)} 
+                                          for k, v in images.items()}, indent=2),
+            "available_tables": json.dumps({k: {"caption": v.get("caption", ""), "aspect": v.get("aspect", 1.0)} 
+                                          for k, v in tables.items()}, indent=2)
+        }
+        max_attempts = self.validation_config["max_llm_attempts"]
+        for attempt in range(max_attempts):
+            try:
+                prompt = Template(self.generate_expected_preset_layout_prompt).render(**template_data)
+                agent.reset()
+                response = agent.step(prompt)
+                result = extract_json(response.content)
+                if "expected_preset_layout" in result:
+                    log_agent_success(self.name, f"generated expected preset layout")
+                    return result
+                else:
+                    log_agent_warning(self.name, f"attempt {attempt + 1}: invalid expected preset layout")
+            except Exception as e:
+                log_agent_warning(self.name, f"generate expected preset layout attempt {attempt + 1} failed: {e}")
+                if attempt == max_attempts - 1:
+                    raise ValueError("failed to generate expected preset layout after multiple attempts")
+        
+       
+
     def _validate_structured_sections(self, structured_sections: Dict) -> bool:
         """validate structured sections format"""
         if "paper_sections" not in structured_sections:

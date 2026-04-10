@@ -1,5 +1,7 @@
 **Task:** In strict accordance with the following requirements, conduct multi-dimensional scoring on the input academic poster based on the original poster text.
-Input: {{ raw_text }}
+Input: 
+- raw paper: {{ raw_text }}
+- expected preset layout: {{ expected_preset_layout }}
 
 **Requirements:**
 
