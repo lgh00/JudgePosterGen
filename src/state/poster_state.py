@@ -124,7 +124,7 @@ class PosterState(TypedDict):
     errors: List[str]
 
 
-def create_state(pdf_path: str, text_model: str = "gpt-4.1-2025-04-14", vision_model: str = "gpt-4.1-2025-04-14", width: int = 84, height: int = 42, url: str = "", logo_path: str = "", aff_logo_path: str = "") -> PosterState:
+def create_state(pdf_path: str, text_model: str = "gpt-4.1-2025-04-14", vision_model: str = "gpt-4.1-2025-04-14", width: int = 84, height: int = 42, url: str = "", aff_logo_path: str = "") -> PosterState:
     """create initial poster state"""
     from pathlib import Path
 
@@ -158,7 +158,6 @@ def create_state(pdf_path: str, text_model: str = "gpt-4.1-2025-04-14", vision_m
         keywords=None,
         styled_layout=None,
         url=url,
-        logo_path=logo_path,
         aff_logo_path=aff_logo_path,
         tokens=TokenUsage(),
         timing_metrics=TimingMetrics(),

@@ -191,7 +191,7 @@ def main():
     parser.add_argument("--poster_width", type=float, default=48, help="Poster width in inches")
     parser.add_argument("--poster_height", type=float, default=27, help="Poster height in inches")
     parser.add_argument("--url", type=str, help="URL for QR code on poster") # TODO
-    parser.add_argument("--logo", type=str, default="./data/Robustness_Reprogramming_for_Representation_Learning/logo.png", help="Path to conference/journal logo")
+    #parser.add_argument("--logo", type=str, default="./data/Robustness_Reprogramming_for_Representation_Learning/logo.png", help="Path to conference/journal logo")
     parser.add_argument("--aff_logo", type=str, default="./data/Robustness_Reprogramming_for_Representation_Learning/aff.png", help="Path to affiliation logo")
     
     args = parser.parse_args()
@@ -252,7 +252,7 @@ def main():
         state = create_state(
             pdf_path, args.text_model, args.vision_model,
             final_width, final_height,
-            args.url, args.logo, args.aff_logo,
+            args.url, args.aff_logo,
         )
 
         state["timing_metrics"].pipeline_start = time.time()
@@ -289,8 +289,8 @@ def main():
         log_agent_info("pipeline", f"Total API calls: {total_calls}")
         log_agent_info("pipeline", f"Total tokens: {final_state['tokens'].input_text} → {final_state['tokens'].output_text}")
 
-        output_path = Path(final_state["output_dir"]) / f"{final_state['poster_name']}.pptx"
-        log_agent_info("pipeline", f"Final poster saved to: {output_path}")
+        #output_path = Path(final_state["output_dir"]) / f"{final_state['poster_name']}.pptx"
+        #log_agent_info("pipeline", f"Final poster saved to: {output_path}")
 
         return 0
         

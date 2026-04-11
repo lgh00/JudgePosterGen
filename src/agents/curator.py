@@ -104,7 +104,7 @@ class StoryBoardCurator:
                 response = agent.step(prompt)
                 with open(Path(state["output_dir"]) / "model_reply_create_story_board.txt", 'w', encoding='utf-8') as f:
                     f.write(response.content)
-                    print("successfully write model's reply of create_story_board")
+                    log_agent_info(self.name, "successfully write model's reply of create_story_board")
                     
                 story_board = extract_json(response.content)
                 #story_board = extract_json(content)
