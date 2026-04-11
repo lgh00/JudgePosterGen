@@ -14,12 +14,12 @@ for sub_folder in os.listdir(DATA_FOLDER):
         cmd = ["python", "-m", "src.workflow.pipeline"]
         cmd.append(f"--poster_width 48 --poster_height 36")
         cmd.append(f"--paper_path {paper_pdf}")
-        cmd.append(f"--text_model qwen3-max")
-        cmd.append(f"--vision_model qwen3-vl-plus")
+        cmd.append(f"--text_model qwen3.6-plus")
+        cmd.append(f"--vision_model qwen3.6-plus")
         cmd.append(f"--aff_logo {aff_png}")
         print(" ".join(cmd))
         os.system(" ".join(cmd))
-        exit(0)
+       # exit(0)
 '''
 python -m src.workflow.pipeline 
   --poster_width 48 --poster_height 36 
