@@ -153,7 +153,7 @@ class Parser:
                 agent.reset()
 
                 response = agent.step(prompt)
-                with open(Path(state["output_dir"]) / "model_reply_choose_poster_section_number.txt", 'w', encoding='utf-8') as f:
+                with open(Path(state["output_dir"]) / "content/model_reply_choose_poster_section_number.txt", 'w', encoding='utf-8') as f:
                     f.write(response.content)
                     log_agent_info(self.name, "successfully write model's reply of choose_poster_section_number")
                 poster_section_number_content = extract_json(response.content)
@@ -177,7 +177,7 @@ class Parser:
                 agent.reset()
                 response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
-                with open(Path(state["output_dir"]) / "model_reply_generate_narrative_content.txt", 'w', encoding='utf-8') as f:
+                with open(Path(state["output_dir"]) / "content/model_reply_generate_narrative_content.txt", 'w', encoding='utf-8') as f:
                     f.write(response.content)
                     log_agent_info(self.name, "successfully write model's reply of generate_narrative_content")
                     
@@ -335,7 +335,7 @@ class Parser:
                 agent.reset()
                 response = agent.step(prompt)
                 ###
-                with open(Path(state["output_dir"]) / "model_reply_extract_title_authors.txt", 'w', encoding='utf-8') as f:
+                with open(Path(state["output_dir"]) / "content/model_reply_extract_title_authors.txt", 'w', encoding='utf-8') as f:
                     f.write(response.content)
                     log_agent_info(self.name, "successfully write model's reply of extract_title_authors")
                 result = extract_json(response.content)
@@ -416,7 +416,7 @@ class Parser:
 
                 response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
-                with open(Path(state["output_dir"]) / "model_reply_classify_visual_assets.txt", 'w', encoding='utf-8') as f:
+                with open(Path(state["output_dir"]) / "content/model_reply_classify_visual_assets.txt", 'w', encoding='utf-8') as f:
                     f.write(response.content)
                     log_agent_info(self.name, "successfully write model's reply of classify_visual_assets") 
                 classification = extract_json(response.content)
@@ -480,7 +480,7 @@ class Parser:
                 agent.reset()
                 response = agent.step(prompt)
                 ###修改的不只是content,token全部换为0
-                with open(Path(state["output_dir"]) / "model_reply_extract_structured_sections.txt", 'w', encoding='utf-8') as f:
+                with open(Path(state["output_dir"]) / "content/model_reply_extract_structured_sections.txt", 'w', encoding='utf-8') as f:
                     f.write(response.content)
                     log_agent_info(self.name, "successfully write model's reply of extract_structured_sections")
                 structured_sections = extract_json(response.content)

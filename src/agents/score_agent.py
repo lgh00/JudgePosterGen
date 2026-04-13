@@ -76,9 +76,6 @@ class ScoreAgent:
                 ]
                 
                 response = agent.step(json.dumps(messages))
-                with open(Path(state["output_dir"]) / "model_reply_score_poster.txt", "w", encoding='utf-8') as f:
-                    f.write(response.content)
-                    print("successfully write model's reply of scoring poster")
                 result = extract_json(response.content)
                 if self._validate_score(result, score_standard):
                     log_agent_success(self.name, f"successfully scored poster {Path(poster_path).name}")
@@ -116,7 +113,7 @@ class ScoreAgent:
         return True
 
     def _save_score(self, state: PosterState, poster_score: Dict):
-        with open(Path(state["output_dir"]) / f"content/best_poster_score.json", "w", encoding='utf-8') as f:
+        with open(Path(state["output_dir"]) / f"best_poster_score.json", "w", encoding='utf-8') as f:
             json.dump(poster_score, f, indent=2)
         log_agent_success(self.name, f"successfully save best poster score")
 

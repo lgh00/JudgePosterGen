@@ -74,7 +74,7 @@ class ColorAgent:
             ]
             
             response = agent.step(json.dumps(messages))
-            with open(Path(state["output_dir"]) / "model_reply_extract_theme_from_logo.txt", 'w', encoding='utf-8') as f:
+            with open(Path(state["output_dir"]) / "content/model_reply_extract_theme_from_logo.txt", 'w', encoding='utf-8') as f:
                 f.write(response.content)
                 log_agent_info(self.name, "successfully write model's reply of extracting theme from logo")
             result = extract_json(response.content)

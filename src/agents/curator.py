@@ -102,7 +102,7 @@ class StoryBoardCurator:
                 prompt = Template(self.spatial_planning_prompt).render(**template_data)
                 agent.reset()
                 response = agent.step(prompt)
-                with open(Path(state["output_dir"]) / "model_reply_create_story_board.txt", 'w', encoding='utf-8') as f:
+                with open(Path(state["output_dir"]) / "content/model_reply_create_story_board.txt", 'w', encoding='utf-8') as f:
                     f.write(response.content)
                     log_agent_info(self.name, "successfully write model's reply of create_story_board")
                     
