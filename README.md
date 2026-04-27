@@ -182,7 +182,6 @@ python -m src.workflow.pipeline
   --paper_path ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/paper.pdf 
   --text_model qwen3-max 
   --vision_model qwen3-vl-plus 
-  --logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/logo.png 
   --aff_logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/aff.png
 ```
 ```powershell
@@ -191,7 +190,6 @@ python -m src.workflow.pipeline `
   --paper_path ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/paper.pdf `
   --text_model qwen3-max `
   --vision_model qwen3-vl-plus `
-  --logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/logo.png `
   --aff_logo ./data/Active_Geospatial_Search_for_Efficient_Tenant_Eviction_Outreach/aff.png
 ```
 **Parameters:**

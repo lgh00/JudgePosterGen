@@ -52,13 +52,13 @@ class ScoreAgent:
             try:
                 with open(poster_path, "rb") as f:
                     img_data = base64.b64encode(f.read()).decode()
-                    
                 agent = LangGraphAgent(
                     "poster scoring expert",
                     state["vision_model"],
                     state,
                     "score_agent"
                 )
+                agent.reset()
                 with open("config/prompts/score_render_poster_standards.json", 'r', encoding='utf-8') as f:
                     score_standard = json.load(f)
                 raw_text = state["raw_text"]
@@ -71,10 +71,8 @@ class ScoreAgent:
                 ###检验
                 messages = [
                     {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_data}"}},
-                    {"type": "text", "text": score_prompt}
-                        
+                    {"type": "text", "text": score_prompt}   
                 ]
-                
                 response = agent.step(json.dumps(messages))
                 result = extract_json(response.content)
                 if self._validate_score(result, score_standard):
