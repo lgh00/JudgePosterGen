@@ -177,18 +177,29 @@ class Renderer:
                         "color": self._parse_color(color_scheme["mono_light"])
                     }
                     elements_layout.append(section_container_element)
-                # 处理子标题
+                # 处理子标题, 只显示前两个
                 if len(subtitle_item) > 2:
                     subtitle_content = "_".join(subtitle_item[:2])
                 else:
                     subtitle_content = "_".join(subtitle_item)
+                # 在子标题前设计一个主题色矩形，用于标识该区域
+                subtitle_rect_layout = {
+                    "element_type": "subtitle_rect",
+                    "x": x + self.config["layout"]["subtitle_margin"],
+                    "y": y + self.config["layout"]["subtitle_margin"],
+                    "width": self.config["layout"]["subtitle_rect"]["width"],
+                    "height": self.config["layout"]["subtitle_rect"]["height"],
+                    "color": self._parse_color(color_scheme["theme"])
+                }
+                elements_layout.append(subtitle_rect_layout)
+                # 处理子标题文本
                 subtitle_element_layout = {
                     "element_type": "subtitle",
                     "section_title": section_title,
                     "content": subtitle_content,
-                    "x": x + self.config["layout"]["subtitle_margin"],
+                    "x": x + self.config["layout"]["subtitle_margin"] + self.config["layout"]["subtitle_rect"]["width"] +0.5,#防止子标题文本与矩形重叠
                     "y": y + self.config["layout"]["subtitle_margin"],
-                    "width": width - self.config["layout"]["subtitle_margin"] * 2,
+                    "width": width - self.config["layout"]["subtitle_margin"] * 2 - self.config["layout"]["subtitle_rect"]["width"] -0.5,#防止子标题文本与矩形重叠
                     "height": self.config["typography"]["sizes"]["section_title"] / 72 + self.config["layout"]["subtitle_margin"],
                     "font_size": self.config["typography"]["sizes"]["section_title"],
                     "font": self.config["typography"]["fonts"]["section_title"]
@@ -454,6 +465,11 @@ class Renderer:
                     Inches(element_layout["width"]),
                     Inches(element_layout["height"])
                 )
+            elif element_layout["element_type"] == "subtitle_rect":
+                container = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(element_layout["x"]), Inches(element_layout["y"]), Inches(element_layout["width"]), Inches(element_layout["height"]))
+                container.fill.solid()
+                container.fill.fore_color.rgb = element_layout["color"]
+                container.line.fill.background()  # no border
             elif element_layout["element_type"] == "text":
                 textbox = slide.shapes.add_textbox(
                     Inches(element_layout["x"]),

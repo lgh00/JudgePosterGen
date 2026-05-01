@@ -25,7 +25,11 @@ layout:
     margin: 0.3
     spacing: 0.3
     max_width: 10.0
-  aff_logo_height: 1.0 #inches固定的从属机构标志
+  aff_logo_height: 1.0 #inches固定的从属机构标志高度
+  subtitle_rect:
+    height: 1.2 #inches子标题矩形高度
+    width: 0.6 #inches子标题矩形宽度
+
 
 typography:
   fonts:

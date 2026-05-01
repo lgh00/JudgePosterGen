@@ -19,7 +19,7 @@ for sub_folder in os.listdir(DATA_FOLDER):
         cmd.append(f"--aff_logo {aff_png}")
         print(" ".join(cmd))
         os.system(" ".join(cmd))
-       # exit(0)
+        exit(0)
 '''
 python -m src.workflow.pipeline 
   --poster_width 48 --poster_height 36 
